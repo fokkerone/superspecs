@@ -4,6 +4,9 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 
 ## Lifecycle (always in order)
 
+**Phase 0 — Setup**
+- `/techstack` — questionnaire: define stack, get skill & library recommendations, save to wiki
+
 **Phase 1 — Plan**
 - `/discuss` — capture decisions before planning
 - `/spec` — write spec (fits 200k context window)
