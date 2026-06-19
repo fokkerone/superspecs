@@ -63,8 +63,8 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  Every requirement is testable.                     │
 │  The spec fits a fresh 200k context window.         │
 ├─────────────────────────────────────────────────────┤
+│  /design-import <path>  (optional, see §1.0)        │
 │  /discuss  →  /spec  →  /grill                      │
-│  or: /design-import <path>  →  /grill               │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -115,37 +115,28 @@ Define the project's tech stack through a guided questionnaire. Get concrete rec
 
 Before any code exists, the plan must fit in a fresh 200k-token context window. This discipline ensures every executor starts clean — no partial history, no reconstructed intent.
 
-There are two entry points into Phase 1:
+### 1.0 Design Import (`/superspecs:design-import`) — optional
 
-| Entry point | When to use |
-|-------------|------------|
-| `/superspecs:discuss` → `/superspecs:spec` | Starting from scratch — conversational planning |
-| `/superspecs:design-import <path>` | You have a DesignOS export — auto-generates DISCUSS.md + spec.md + tasks.md |
+> **Optional enrichment.** Run before `/discuss` when you have a DesignOS export. Creates `design-context.md` that carries design constraints, data shapes, milestone structure, and test scaffolding. The normal `/discuss` + `/spec` flow still runs — it just reads `design-context.md` alongside `DISCUSS.md`.
 
-Both paths end with `/superspecs:grill` before execution.
+A DesignOS export is a structured product package: product overview, incremental milestones, test instructions, TypeScript types, design system tokens, and component screenshots. This skill reads the export and extracts the planning-relevant material into a single context file.
 
-### 1.0 Design Import (`/superspecs:design-import`)
+**What gets extracted into `design-context.md`:**
 
-> **Alternative to `/discuss` + `/spec`** — use this when you have a DesignOS export.
+| DesignOS file | Extracted as |
+|--------------|--------------|
+| `product-overview.md` | Product overview + open questions for `/discuss` |
+| `incremental/01-shell.md` … `NN-section.md` | Milestone → wave mapping for `tasks.md` |
+| `test-instructions/tests.md` | Test scaffolding → GIVEN/WHEN/THEN starting points for `/spec` |
+| `data-shape/types.ts` | Data contract → Interface section in `/spec` |
+| `design-system/` | Locked constraint → NFRs + Out of Scope in `/spec` |
+| `components/screenshots/` | Preserved in `wiki/raw/design-system/screenshots/` (visual refs for subagents) |
 
-A DesignOS export is a structured product package: product overview, incremental milestones, test instructions, TypeScript types, design system tokens, and component screenshots. This skill reads the entire export and generates the full Phase 1 output automatically.
+**Build order is sequential:** Each DesignOS milestone maps to one execution wave. Wave N always depends on Wave N-1. The shell milestone (01) is always Wave 1 — it installs design tokens and structure that all later sections depend on.
 
-**Mapping from DesignOS → SuperSpecs:**
+**Output:** `design-context.md` (or enriched `DISCUSS.md` if one already exists) + design assets in `wiki/raw/design-system/`.
 
-| DesignOS file | SuperSpecs output |
-|--------------|-----------------|
-| `product-overview.md` | `DISCUSS.md` + `spec.md` Purpose |
-| `incremental/01-shell.md` … `NN-section.md` | Wave 1 … N in `tasks.md` (sequential) |
-| `test-instructions/tests.md` | GIVEN/WHEN/THEN scenarios in `spec.md` |
-| `data-shape/types.ts` | Interface/Contract section in `spec.md` |
-| `design-system/` | Locked constraint in spec + `wiki/raw/design-system/` |
-| `components/screenshots/` | `wiki/raw/design-system/screenshots/` (visual refs for subagents) |
-
-**Build order is sequential:** Each DesignOS milestone becomes one wave. Wave N always depends on Wave N-1. The shell (milestone 01) is always Wave 1 — it installs design tokens and structure that all later sections depend on.
-
-**Output:** `DISCUSS.md`, `spec.md`, `tasks.md`, `status.md` + design assets preserved in `wiki/raw/design-system/` for later wiki ingest.
-
-**Next:** `/superspecs:grill <slug>` — the grill still runs even after a design import.
+**Next:** `/superspecs:discuss` — the discussion reads both `design-context.md` and any existing context. Then `/superspecs:spec` writes the spec from both sources. Then `/superspecs:grill`.
 
 ---
 
@@ -156,6 +147,8 @@ Capture implementation decisions _before_ anything is planned. Goals, constraint
 ### 1.2 Spec (`/superspecs:spec`)
 
 Write an OpenSpec-style spec from the discussion. Requirements expressed as SHALL statements with GIVEN/WHEN/THEN scenarios. Lives in `superspec/specs/<slug>/spec.md`.
+
+If `design-context.md` exists alongside `DISCUSS.md`, the spec reads both: `DISCUSS.md` carries human decisions; `design-context.md` carries design constraints. Design system constraints land in Non-Functional Requirements, data contract types in an Interface section, milestones drive the wave structure in `tasks.md`, and test scaffolding becomes scenario starting points.
 
 **Exit criterion:** spec + context fits a fresh 200k-token window. If it doesn't, decompose into smaller specs.
 
@@ -174,8 +167,8 @@ Output: `superspec/specs/<slug>/GRILL.md` + any required updates to `spec.md`.
 
 **Exit criterion:** verdict is READY. A spec that hasn't been grilled does not proceed to execution.
 
-**Skills (manual path):** `/superspecs:discuss` → `/superspecs:spec` → `/superspecs:grill`  
-**Skills (DesignOS path):** `/superspecs:design-import <path>` → `/superspecs:grill`
+**Skills:** `/superspecs:discuss` → `/superspecs:spec` → `/superspecs:grill`  
+**With DesignOS export:** `/superspecs:design-import <path>` → `/superspecs:discuss` → `/superspecs:spec` → `/superspecs:grill`
 
 ---
 
@@ -228,8 +221,15 @@ Compile the implemented feature into the project wiki — architecture decisions
 
 ### Wiki Operations (any time)
 
-- **`/superspecs:wiki-query`** — query the compiled wiki; reads `wiki/` only, never raw specs; optionally files the answer back as a new page
-- **`/superspecs:wiki-lint`** — health check: orphans, broken wikilinks, contradictions, stale file refs
+| Command | What it does |
+|---------|-------------|
+| **`/superspecs:wiki-query`** | Query the compiled wiki using tiered retrieval; optionally file the answer back as a new page |
+| **`/superspecs:wiki-capture`** | Save session findings now — `--quick` stages to `raw/`, `--full` ingests directly |
+| **`/superspecs:wiki-lint`** | Health check: orphans, broken wikilinks, contradictions, stale file refs |
+| **`/superspecs:cross-linker`** | Auto-insert `[[wikilinks]]` for unlinked mentions across the vault |
+| **`/superspecs:wiki-status`** | Vault dashboard: page count, hub pages, tag distribution, provenance, pending sources |
+| **`/superspecs:tag-taxonomy`** | Canonical tag vocabulary; audit and normalize tags vault-wide |
+| **`/superspecs:wiki-rebuild`** | Archive + rebuild vault from scratch; restore from snapshot |
 
 ---
 
@@ -479,6 +479,7 @@ your-project/
 │   ├── specs/                      # Feature specifications
 │   │   └── <slug>/
 │   │       ├── DISCUSS.md          # Pre-planning decisions
+│   │       ├── design-context.md   # Optional — from /design-import (DesignOS enrichment)
 │   │       ├── spec.md             # The spec (SHALL + scenarios)
 │   │       ├── tasks.md            # Implementation tasks
 │   │       └── status.md           # Phase + checklist
@@ -536,7 +537,7 @@ your-project/
 | Phase   | Skill               | Command                      | What it does                                                                 |
 | ------- | ------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
 | Setup   | `techstack`         | `/superspecs:techstack`      | Questionnaire: define stack, recommend skills & libraries, save wiki profile |
-| Plan    | `design-import`     | `/superspecs:design-import`  | Import DesignOS export → auto-generates DISCUSS.md + spec.md + tasks.md     |
+| Plan    | `design-import`     | `/superspecs:design-import`  | Optional enrichment: reads DesignOS export, creates `design-context.md` for `/discuss` + `/spec` to use |
 | Plan    | `plan-discuss`      | `/superspecs:discuss`        | Capture decisions before planning                                            |
 | Plan    | `plan-spec`         | `/superspecs:spec`           | Write OpenSpec-style spec                                                    |
 | Plan    | `plan-grill`        | `/superspecs:grill`          | Stress-test spec against wiki + techstack, blocks execution until READY      |
