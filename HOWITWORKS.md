@@ -156,6 +156,33 @@ Each subagent receives: the spec, its task, and nothing else. No shared state. N
 
 The wiki is a living knowledge base — architecture decisions, patterns, trade-offs, gotchas. It survives after the session ends and informs future planning.
 
+#### The wiki as an Obsidian vault
+
+`superspec/wiki/` is pre-configured as an Obsidian vault. `setup.sh` creates:
+
+```
+superspec/wiki/
+├── .obsidian/
+│   ├── app.json            ← wikilinks on, attachment folder set
+│   ├── core-plugins.json   ← graph, backlinks, tag pane, search enabled
+│   └── .gitignore          ← workspace + cache excluded from git
+├── Home.md                 ← vault home page (updated by /wiki)
+├── _manifest.json          ← machine-readable ingestion log
+└── <domain>/
+    ├── Home.md             ← domain index
+    └── <topic>.md          ← one page per knowledge unit
+```
+
+To open the vault: **Obsidian → Open folder as vault → select `superspec/wiki/`**
+
+The `/superspecs:wiki` skill writes every page with:
+- `[[wikilinks]]` for all internal cross-references
+- YAML frontmatter: `tags`, `created`, `updated`, `spec` (links back to the source spec)
+- Domain `Home.md` index files for each folder
+- Entries in the vault-wide `Home.md` under Recent Updates
+
+The shared config (`app.json`, `core-plugins.json`) is committed so every team member opens the vault with the same settings. User-specific state (`workspace.json`, `cache`, plugin data) is gitignored.
+
 ### Phase 4 — Ship
 
 **Goal:** Merge and close the loop.

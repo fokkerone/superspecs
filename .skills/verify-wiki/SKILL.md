@@ -11,6 +11,8 @@ You are distilling the completed feature into the living project wiki.
 
 The feature works. The tests pass. Now you extract the knowledge that should survive beyond this session — so future planning, future features, and future sessions start informed.
 
+The wiki lives at `superspec/wiki/` and doubles as an **Obsidian vault**. Write every page to be navigable in Obsidian: use `[[wikilinks]]` for internal links, YAML frontmatter with `tags:`, and keep each page focused on a single knowledge unit.
+
 ## What to distill (and what not to)
 
 **Distill:**
@@ -38,24 +40,25 @@ Read:
 
 ### 2. Determine wiki structure
 
-Check `superspec/wiki/_index.md`. Identify:
+Check `superspec/wiki/Home.md`. Identify:
 - Which domain folder this belongs in (create one if needed)
 - Whether any existing pages should be updated vs. new pages created
 
 Domain examples: `auth/`, `api/`, `data/`, `ui/`, `infra/`, `patterns/`, `decisions/`
 
+Each domain is a subfolder. Each knowledge unit is a single `.md` file inside it.
+
 ### 3. Write wiki pages
 
-For each meaningful knowledge unit:
+For each meaningful knowledge unit, create `superspec/wiki/<domain>/<topic>.md`:
 
 ```markdown
 ---
 title: <Page Title>
 tags: [<domain>, <feature-slug>, <topic-tags>]
-spec: superspec/specs/<slug>/spec.md
-created: <date>
-updated: <date>
-sources: [<slug>]
+spec: "[[<slug>]]"
+created: <YYYY-MM-DD>
+updated: <YYYY-MM-DD>
 ---
 
 # <Page Title>
@@ -73,9 +76,6 @@ When and why this was built. What problem it solves.
 **Over:** <Y>
 **Because:** <reason>
 **Trade-off:** <what was given up>
-
-### <Decision Topic>
-...
 
 ## Patterns
 
@@ -100,23 +100,52 @@ When and why this was built. What problem it solves.
 - [ ] <Unresolved question deferred to future work>
 
 ## Related
-- [[<wikilink>]] — <what it covers>
+- [[<domain>/<page>]] — <what it covers>
 - `<path/to/key/file>` — <what it does>
 ```
 
-### 4. Update the wiki index
+**Obsidian linking rules:**
+- Internal links: always use `[[page-title]]` or `[[folder/page]]`, never markdown `[text](path.md)`
+- File references: use backtick code spans for source file paths (`src/auth/jwt.ts`)
+- Tags: lowercase, hyphenated (`auth`, `jwt-tokens`, `session-management`)
 
-Update `superspec/wiki/_index.md`:
+### 4. Update the vault home page
+
+Update `superspec/wiki/Home.md`:
 
 ```markdown
+---
+title: Wiki Home
+tags: [index, home]
+updated: <YYYY-MM-DD>
+---
+
+# Project Wiki
+
+...
+
 ## Domains
 
-- [[auth/]] — Authentication & authorization
-- [[<new-domain>/]] — <description>
+- [[auth/Home]] — Authentication & authorization
+- [[<new-domain>/Home]] — <description>
 
 ## Recent Updates
 
-- <date>: [[<domain>/<page>]] — <brief description> (from `<slug>`)
+- <YYYY-MM-DD>: [[<domain>/<page>]] — <brief description> (from `<slug>`)
+```
+
+Each domain folder should also have its own `Home.md` listing its pages:
+
+```markdown
+---
+title: <Domain> — Index
+tags: [index, <domain>]
+---
+
+# <Domain>
+
+- [[<page1>]] — <what it covers>
+- [[<page2>]] — <what it covers>
 ```
 
 ### 5. Update the manifest
@@ -149,7 +178,7 @@ Update `superspec/specs/<slug>/status.md`:
 
 ```markdown
 ## Wiki Pages
-- [[superspec/wiki/<domain>/<page>]] — <what it covers>
+- [[<domain>/<page>]] — <what it covers>
 
 ## Phase
 3.2 — Verify › Wiki Import ✅
@@ -165,16 +194,20 @@ Pages updated: Y
 
 superspec/wiki/
 ├── <domain>/
-│   ├── <page1>.md  (new)
-│   └── <page2>.md  (updated)
-└── _index.md (updated)
+│   ├── Home.md      (domain index)
+│   ├── <page1>.md   (new)
+│   └── <page2>.md   (updated)
+└── Home.md          (updated)
 
-Next: /ship <slug>
+Open superspec/wiki/ in Obsidian to browse the vault.
+
+Next: /superspecs:ship <slug>
 ```
 
 ## Output
 
 - New/updated pages in `superspec/wiki/<domain>/`
-- Updated `superspec/wiki/_index.md`
+- Domain `Home.md` index (create if domain is new)
+- Updated `superspec/wiki/Home.md`
 - Updated `superspec/wiki/_manifest.json`
 - Updated `superspec/specs/<slug>/status.md`

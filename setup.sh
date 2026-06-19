@@ -274,20 +274,89 @@ mkdir -p "$PROJECT_DIR/superspec/phases"
 mkdir -p "$PROJECT_DIR/superspec/archive"
 mkdir -p "$PROJECT_DIR/superspec/wiki"
 
-if [ ! -f "$PROJECT_DIR/superspec/wiki/_index.md" ]; then
-cat > "$PROJECT_DIR/superspec/wiki/_index.md" << 'WIKIEOF'
+# ── Obsidian vault config ──────────────────────────────────────────────────
+# Creates superspec/wiki/.obsidian/ so the wiki can be opened as an Obsidian
+# vault directly. Workspace and plugin-data files are gitignored.
+
+OBSIDIAN_DIR="$PROJECT_DIR/superspec/wiki/.obsidian"
+mkdir -p "$OBSIDIAN_DIR"
+
+if [ ! -f "$OBSIDIAN_DIR/app.json" ]; then
+cat > "$OBSIDIAN_DIR/app.json" << 'APPEOF'
+{
+  "attachmentFolderPath": "_attachments",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "",
+  "useMarkdownLinks": false,
+  "showUnsupportedFiles": false,
+  "promptDelete": true,
+  "trashOption": "local"
+}
+APPEOF
+fi
+
+if [ ! -f "$OBSIDIAN_DIR/core-plugins.json" ]; then
+cat > "$OBSIDIAN_DIR/core-plugins.json" << 'CPEOF'
+[
+  "file-explorer",
+  "global-search",
+  "switcher",
+  "graph",
+  "backlinks",
+  "outgoing-link",
+  "tag-pane",
+  "page-preview",
+  "outline",
+  "starred",
+  "command-palette",
+  "file-recovery",
+  "templates",
+  "word-count"
+]
+CPEOF
+fi
+
+# Gitignore for vault-local / user-specific Obsidian files
+if [ ! -f "$OBSIDIAN_DIR/.gitignore" ]; then
+cat > "$OBSIDIAN_DIR/.gitignore" << 'OGIEOF'
+# User-specific Obsidian state — do not commit
+workspace.json
+workspace-mobile.json
+cache
+.trash/
+plugins/*/data.json
+OGIEOF
+fi
+
+# ── Wiki home page ─────────────────────────────────────────────────────────
+
+if [ ! -f "$PROJECT_DIR/superspec/wiki/Home.md" ]; then
+TODAY=$(date +%Y-%m-%d 2>/dev/null || echo "")
+cat > "$PROJECT_DIR/superspec/wiki/Home.md" << HOMEEOF
+---
+title: Wiki Home
+tags: [index, home]
+updated: $TODAY
+---
+
 # Project Wiki
 
-Maintained by SuperSpecs. Distilled knowledge from shipped features.
+Knowledge base distilled from shipped features — architecture decisions, patterns, trade-offs, gotchas.
+
+> **Obsidian vault** — open \`superspec/wiki/\` in [Obsidian](https://obsidian.md) for graph view, backlinks, tag search, and hover previews.
 
 ## Domains
 
-(Added automatically via /wiki after each shipped feature)
+_(domains created automatically by \`/superspecs:wiki\` as features ship)_
 
 ## Recent Updates
 
-(Updated by /wiki)
-WIKIEOF
+_(updated by \`/superspecs:wiki\` after each shipped feature)_
+
+---
+
+_Maintained by [SuperSpecs](https://github.com/fokkerone/superspecs)_
+HOMEEOF
 fi
 
 if [ ! -f "$PROJECT_DIR/superspec/wiki/_manifest.json" ]; then
@@ -305,6 +374,8 @@ echo "  Open your agent and say: \"Tell me about your superspecs\""
 echo ""
 echo "  Claude Code / Cursor:  /superspecs:<cmd>"
 echo "  OpenCode:              /superspecs-<cmd>"
+echo ""
+echo "  Wiki as Obsidian vault → open superspec/wiki/ in Obsidian"
 echo ""
 echo "  First feature workflow:"
 echo "    /superspecs:techstack   (or /superspecs-techstack)"

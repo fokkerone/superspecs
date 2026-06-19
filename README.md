@@ -188,6 +188,8 @@ Full test suite. Coverage check. Every spec scenario verified by a test. No pass
 
 Distill the implemented feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session — it's what makes the next planning cycle start informed instead of blind. Structured, linked, searchable. Not chat history: a real knowledge base.
 
+The wiki at `superspec/wiki/` is an **Obsidian vault**. Open it directly in Obsidian for graph view, backlinks, tag search, and hover previews.
+
 **Skills:** `/superspecs:check-tests` → `/superspecs:wiki`
 
 ---
@@ -221,6 +223,8 @@ Then open your agent and say: **"Tell me about your superspecs"**
 > **Command format by agent**
 > - Claude Code / Cursor: `/superspecs:techstack`
 > - OpenCode / Aider: `/superspecs-techstack`
+
+> **Wiki as Obsidian vault** — after `superspecs install`, open `superspec/wiki/` in [Obsidian](https://obsidian.md) as a vault. Graph view, backlinks, and tag search work out of the box.
 
 ### First feature
 

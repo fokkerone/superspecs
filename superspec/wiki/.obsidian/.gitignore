@@ -1,0 +1,6 @@
+# User-specific Obsidian state — do not commit
+workspace.json
+workspace-mobile.json
+cache
+.trash/
+plugins/*/data.json
