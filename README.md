@@ -186,24 +186,14 @@ Full test suite. Coverage check. Every spec scenario verified by a test. No pass
 
 ### 3.2 Wiki Import (`/superspecs:wiki`)
 
-Distill the implemented feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session — it's what makes the next planning cycle start informed instead of blind. Structured, linked, searchable. Not chat history: a real knowledge base.
-
-This follows the **Karpathy LLM Wiki pattern**: compile raw sources once into structured, interlinked markdown pages. Future sessions query the compiled wiki — not the raw specs. Compile once, query fast. Knowledge compounds.
-
-```
-superspec/wiki/raw/   ← drop source material here (agent reads, never edits)
-superspec/wiki/       ← compiled knowledge base (agent writes on ingest)
-superspec/wiki/log.md ← append-only activity log
-```
-
-The wiki at `superspec/wiki/` is an **Obsidian vault**. Open it directly in Obsidian for graph view, backlinks, tag search, and hover previews.
+Compile the implemented feature into the project wiki — architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session. See [The Wiki](#the-wiki) for the full architecture, ingest process, query, and lint operations.
 
 **Skills:** `/superspecs:check-tests` → `/superspecs:wiki`
 
 ### Wiki Operations (any time)
 
-- **`/superspecs:wiki-query`** — query the compiled wiki for an answer. Reads `wiki/` only — never raw specs. Optionally files the answer back as a new wiki page.
-- **`/superspecs:wiki-lint`** — health check: finds orphaned pages, broken wikilinks, missing cross-links, contradictions, and stale file references.
+- **`/superspecs:wiki-query`** — query the compiled wiki; reads `wiki/` only, never raw specs; optionally files the answer back as a new page
+- **`/superspecs:wiki-lint`** — health check: orphans, broken wikilinks, contradictions, stale file refs
 
 ---
 
@@ -217,7 +207,121 @@ Create the PR. Write a changelog entry. Archive the phase directory. Mark the sp
 
 ---
 
-## Quick Start
+## The Wiki
+
+The wiki is a compiled, structured knowledge base that outlives every session. It implements the **Karpathy LLM Wiki pattern**: raw source material is compiled once into interlinked markdown pages. Future sessions query the compiled wiki — never the raw specs. Compile once, query fast. Knowledge compounds.
+
+### Architecture
+
+```
+superspec/wiki/
+├── raw/                ← you drop files here; agent reads, never edits
+├── Home.md             ← vault home: domain table + recent updates
+├── log.md              ← append-only activity log (grep-friendly)
+├── _manifest.json      ← machine-readable ingestion history
+├── _lint-report.md     ← written by /wiki-lint
+└── <domain>/
+    ├── Home.md         ← domain index
+    ├── <topic-a>.md    ← one page per knowledge unit
+    └── <topic-b>.md
+```
+
+Three layers:
+
+| Layer | Path | Who touches it |
+|-------|------|----------------|
+| **Raw** (source material) | `wiki/raw/` | You drop files; agent reads only |
+| **Compiled** (knowledge base) | `wiki/` | Agent writes on ingest/query/lint |
+| **Schema** (operating rules) | `.skills/verify-wiki/SKILL.md` | Defines how to ingest, link, and format |
+
+The wiki doubles as an **Obsidian vault**. Open `superspec/wiki/` in Obsidian for graph view, backlinks, tag search, and hover previews — all pre-configured by `superspecs install`.
+
+---
+
+### Ingest — `/superspecs:wiki`
+
+Run after every `/ship`. Compiles a completed, verified feature into the wiki.
+
+**What it does:**
+
+1. Reads the raw source material — `DISCUSS.md`, `spec.md`, `review-log.md`, key implementation files
+2. **Scans existing wiki pages first** — updates a page if the topic already exists, never creates duplicates
+3. Writes new pages to `wiki/<domain>/<topic>.md` with:
+   - YAML frontmatter: `title`, `tags`, `created`, `updated`, `spec`
+   - `[[wikilinks]]` for all internal cross-references
+   - Sections: Summary, Context, Key Decisions, Patterns, Gotchas, Interface/Contract, Open Questions, Related
+4. Updates the domain `Home.md` index
+5. Updates `wiki/Home.md` — domain table + Recent Updates (last 10)
+6. Appends to `wiki/log.md`: `## [YYYY-MM-DD] ingest | <slug>: <title>`
+7. Updates `_manifest.json`
+
+**What it distills:**
+
+- Architecture decisions (what was chosen and why, what was traded away)
+- Patterns discovered or established
+- Gotchas — things harder than expected and how they were resolved
+- Key interfaces and data shapes future code needs to know
+- Open questions deferred to future work
+
+**What it does NOT copy:** full code listings, task checklists, or the spec itself.
+
+---
+
+### Query — `/superspecs:wiki-query`
+
+Ask a question; get an answer synthesized from the compiled wiki.
+
+```
+"What do we know about error handling?"
+"What was the decision on the database choice?"
+"Find everything about the payment integration."
+```
+
+**What it does:**
+
+1. Reads `wiki/Home.md` and `log.md` to orient
+2. Searches domain indexes, page titles, tags, and `## Summary` sections
+3. Follows `[[wikilinks]]` one level deep to find related pages
+4. Synthesizes an answer **in the response** with cited wiki sources
+5. Signals gaps clearly: *"No wiki page for X — has this feature been shipped? Run `/wiki <slug>` to compile it."*
+
+**Key rule:** reads `wiki/` only — never `raw/`, never specs, never source code. If the answer isn't in the compiled wiki, the knowledge hasn't been ingested yet.
+
+**Optional:** after answering, the agent offers to file the answer back as a new wiki page — useful for synthesized cross-domain knowledge that doesn't belong to a single spec.
+
+---
+
+### Lint — `/superspecs:wiki-lint`
+
+Periodic health check. Finds structural and semantic problems across the vault.
+
+| Check | What it finds |
+|-------|--------------|
+| **Orphaned pages** | Pages with no inbound `[[wikilinks]]` from other pages |
+| **Broken wikilinks** | `[[links]]` pointing to pages that don't exist |
+| **Missing cross-links** | Page A mentions a topic that has a page B, but doesn't link to it |
+| **Contradictions** | Two pages make conflicting claims about the same decision or pattern |
+| **Stale file refs** | Backtick paths (`` `src/auth/jwt.ts` ``) pointing to files that no longer exist |
+| **Missing frontmatter** | Pages missing `title`, `tags`, `created`, or `updated` |
+| **Undocumented domains** | A domain folder exists but has no `Home.md` index |
+
+Output: `wiki/_lint-report.md` (overwritten on each run) + an entry appended to `log.md`.
+
+Auto-fixes safe issues (missing frontmatter, unambiguous broken links) with confirmation. Contradictions always require human review.
+
+---
+
+### When to run each command
+
+| When | Command |
+|------|---------|
+| After every `/ship` | `/superspecs:wiki <slug>` |
+| Before starting a new planning cycle | `/superspecs:wiki-query "What do we know about X?"` |
+| Before `/grill` — check existing decisions | `/superspecs:wiki-query` |
+| You drop an article or doc into `raw/` | `/superspecs:wiki <filename>` |
+| Monthly / before a release | `/superspecs:wiki-lint` |
+
+---
 
 ```bash
 # Install globally
@@ -276,11 +380,14 @@ your-project/
 │   │       ├── review-log.md       # Code review history
 │   │       └── wave-*.md           # Parallel execution waves
 │   │
-│   └── wiki/                       # Living knowledge base
-│       ├── _index.md
-│       ├── _manifest.json
+│   └── wiki/                       # Living knowledge base (Obsidian vault)
+│       ├── raw/                    # Source material — agent reads, never edits
+│       ├── Home.md                 # Vault home + domain catalog
+│       ├── log.md                  # Append-only activity log
+│       ├── _manifest.json          # Machine-readable ingestion history
 │       └── <domain>/
-│           └── <topic>.md
+│           ├── Home.md             # Domain index
+│           └── <topic>.md          # One page per knowledge unit
 │
 ├── .skills/                        # SuperSpecs skills (source of truth)
 │   ├── techstack/SKILL.md
