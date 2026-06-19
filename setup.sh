@@ -79,9 +79,12 @@ symlink_skills() {
   echo "  ✓ $label"
 }
 
-# Commands: symlink each skill as a command file using its slash_command value
-# Claude Code style: <cmd_dir>/superspecs/<slash_cmd>.md  → /superspecs:<slash_cmd>
-# OpenCode style:    <cmd_dir>/superspecs-<slash_cmd>.md  → /superspecs-<slash_cmd>
+# Commands: generate a clean command .md file for each skill
+# File name determines command name — NOT frontmatter.
+# Claude Code: <cmd_dir>/superspecs/<slash_cmd>.md  → /superspecs:<slash_cmd>
+# OpenCode:    <cmd_dir>/superspecs-<slash_cmd>.md  → /superspecs-<slash_cmd>
+# NOTE: Only `description` frontmatter is written — agent-specific fields
+# (slash_command, name, phase) from SKILL.md are intentionally omitted.
 install_commands() {
   local cmd_dir="$1"   # base commands directory
   local prefix="$2"    # "" (use superspecs/ subdir) or "superspecs-" (flat prefix)
@@ -98,13 +101,30 @@ install_commands() {
   for skill_dir in "$SKILLS_DIR"/*/; do
     local skill_file="$skill_dir/SKILL.md"
     [ -f "$skill_file" ] || continue
+
+    # Read slash_command from frontmatter (determines the command file name)
     local slash_cmd
     slash_cmd=$(grep '^slash_command:' "$skill_file" 2>/dev/null | head -1 \
                 | sed 's/^slash_command: *//' | tr -d '"' | tr -d "'")
     [ -z "$slash_cmd" ] && continue
-    # Skip template placeholders like <command:name>
-    case "$slash_cmd" in *"<"*) continue ;; esac
-    ln -sf "$skill_file" "$target_dir/${prefix}${slash_cmd}.md" 2>/dev/null || true
+    case "$slash_cmd" in *"<"*) continue ;; esac  # skip template placeholders
+
+    # Read description from frontmatter (the only frontmatter field agents need)
+    local description
+    description=$(grep '^description:' "$skill_file" 2>/dev/null | head -1 \
+                  | sed 's/^description: *//')
+
+    # Extract body = everything after the closing frontmatter `---`
+    local body
+    body=$(awk 'BEGIN{c=0} /^---/{c++; next} c>=2{print}' "$skill_file")
+
+    # Remove old file or symlink, then write a real generated command file
+    local cmd_file="$target_dir/${prefix}${slash_cmd}.md"
+    rm -f "$cmd_file" 2>/dev/null || true
+    {
+      printf -- '---\ndescription: %s\n---\n\n' "$description"
+      printf '%s\n' "$body"
+    } > "$cmd_file"
   done
   echo "  ✓ $label"
 }
