@@ -114,17 +114,17 @@ Define the project's tech stack through a guided questionnaire. Get concrete rec
 
 Before any code exists, the plan must fit in a fresh 200k-token context window. This discipline ensures every executor starts clean — no partial history, no reconstructed intent.
 
-### 1.1 Discuss (`/discuss`)
+### 1.1 Discuss (`/superspecs:discuss`)
 
 Capture implementation decisions _before_ anything is planned. Goals, constraints, open questions, explicit non-goals. One question at a time, conversational. The output is a `DISCUSS.md` — the foundation for the spec.
 
-### 1.2 Spec (`/spec`)
+### 1.2 Spec (`/superspecs:spec`)
 
 Write an OpenSpec-style spec from the discussion. Requirements expressed as SHALL statements with GIVEN/WHEN/THEN scenarios. Lives in `superspec/specs/<slug>/spec.md`.
 
 **Exit criterion:** spec + context fits a fresh 200k-token window. If it doesn't, decompose into smaller specs.
 
-### 1.3 Grill (`/grill`)
+### 1.3 Grill (`/superspecs:grill`)
 
 A relentless interview to stress-test the spec before any code is written. The agent walks every branch of the decision tree — one question at a time, always providing a recommended answer.
 
@@ -147,19 +147,19 @@ Output: `superspec/specs/<slug>/GRILL.md` + any required updates to `spec.md`.
 
 Parallel execution. Each subagent gets a clean context. No shared state between tasks. No "do you remember what we talked about earlier" — the spec and the wiki carry everything.
 
-### 2.1 Pick Spec (`/pick-spec`)
+### 2.1 Pick Spec (`/superspecs:pick-spec`)
 
 Choose the next spec to execute. Check dependencies, verify the spec is complete, confirm it fits a fresh context window.
 
-### 2.2 Branch (`/branch`)
+### 2.2 Branch (`/superspecs:branch`)
 
 Create a git branch or worktree for isolated execution. One branch per spec.
 
-### 2.3 Subagent Development (`/subagent`)
+### 2.3 Subagent Development (`/superspecs:subagent`)
 
 Dispatches a fresh subagent per task. Each gets: the spec, the task, and nothing else. Two-stage review per task: spec compliance first, code quality second. Supports batch mode with human checkpoints between waves.
 
-### 2.4 TDD (`/tdd`)
+### 2.4 TDD (`/superspecs:tdd`)
 
 Enforces RED → GREEN → REFACTOR strictly:
 
@@ -168,7 +168,7 @@ Enforces RED → GREEN → REFACTOR strictly:
 3. Commit
 4. Code written before a failing test gets deleted
 
-### 2.5 Code Review (`/code-review`)
+### 2.5 Code Review (`/superspecs:code-review`)
 
 Runs between tasks. Reviews against the spec. Reports issues by severity. **Critical issues block all progress** — nothing moves forward until resolved.
 
@@ -180,11 +180,11 @@ Runs between tasks. Reviews against the spec. Reports issues by severity. **Crit
 
 Walk through what was built. Diagnose and fix before declaring done. Then distill everything learned into the wiki — so the next session inherits the knowledge.
 
-### 3.1 Check Tests (`/check-tests`)
+### 3.1 Check Tests (`/superspecs:check-tests`)
 
 Full test suite. Coverage check. Every spec scenario verified by a test. No passing with skipped or pending tests.
 
-### 3.2 Wiki Import (`/wiki`)
+### 3.2 Wiki Import (`/superspecs:wiki`)
 
 Distill the implemented feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session — it's what makes the next planning cycle start informed instead of blind. Structured, linked, searchable. Not chat history: a real knowledge base.
 
@@ -194,7 +194,7 @@ Distill the implemented feature into the project wiki. Architecture decisions, p
 
 ## Phase 4 — Ship
 
-### Ship (`/ship`)
+### Ship (`/superspecs:ship`)
 
 Create the PR. Write a changelog entry. Archive the phase directory. Mark the spec complete. Trigger the next cycle.
 
@@ -269,6 +269,7 @@ your-project/
 │   ├── techstack/SKILL.md
 │   ├── plan-discuss/SKILL.md
 │   ├── plan-spec/SKILL.md
+│   ├── plan-grill/SKILL.md
 │   ├── execute-pick-spec/SKILL.md
 │   ├── execute-branch/SKILL.md
 │   ├── execute-subagent/SKILL.md
@@ -276,7 +277,8 @@ your-project/
 │   ├── execute-review/SKILL.md
 │   ├── verify-tests/SKILL.md
 │   ├── verify-wiki/SKILL.md
-│   └── ship/SKILL.md
+│   ├── ship/SKILL.md
+│   └── skill-creator/SKILL.md
 │
 ├── CLAUDE.md                       # Bootstrap → Claude Code
 ├── AGENTS.md                       # Bootstrap → Codex / OpenCode / Aider

@@ -1,6 +1,6 @@
 # How SuperSpecs Works
 
-An explanation of the mechanics behind the framework — how skills are discovered, how agents load instructions, and how the four-phase lifecycle runs.
+An explanation of the mechanics behind the framework — how skills are discovered, how slash commands are registered, and how the four-phase lifecycle runs.
 
 ---
 
@@ -26,50 +26,71 @@ Each `SKILL.md` starts with a YAML frontmatter block:
 
 ```yaml
 ---
-name: TDD Execution
+name: execute-tdd
 description: Enforce RED → GREEN → REFACTOR with no exceptions
-slash_command: /tdd
+slash_command: tdd
 phase: "2.4"
 ---
 ```
 
-The rest of the file is a detailed, imperative instruction set written for the agent to follow when that slash command is invoked.
+- `slash_command` determines the command file name (e.g. `tdd.md` → `/superspecs:tdd`)
+- `description` is used in command files and agent skill listings
+- The body is the detailed instruction set the agent follows when invoked
 
 ---
 
-## Skill Discovery — How Agents Find Skills
+## Two-Layer Installation
 
-Each AI coding tool has a designated directory it scans for skills at startup. `setup.sh` symlinks every `SKILL.md` into each of those directories:
+`setup.sh` runs two separate installation steps for each agent:
 
-```
-~/.claude/skills/execute-tdd.md   → .skills/execute-tdd/SKILL.md
-~/.agents/skills/execute-tdd.md   → .skills/execute-tdd/SKILL.md
-~/.codex/skills/execute-tdd.md    → .skills/execute-tdd/SKILL.md
-# ... same for every agent
-```
+### 1. Skills (auto-discovery)
 
-When an agent starts, it reads its skills directory and registers each file as an available skill. The agent now knows about `/tdd`, `/spec`, `/ship`, and all the others — before any user message is sent.
+Each AI tool has a designated directory it scans for skills. `setup.sh` creates a `<name>/SKILL.md` symlink structure in each of those directories:
 
 ```
-Agent startup
-     │
-     ▼
-Read ~/.claude/skills/*.md
-     │
-     ▼
-Register skill: /discuss, /spec, /pick-spec, /branch,
-                /subagent, /tdd, /code-review,
-                /check-tests, /wiki, /ship
-     │
-     ▼
-Agent is ready — all commands available
+~/.claude/skills/execute-tdd/SKILL.md   → .skills/execute-tdd/SKILL.md
+~/.agents/skills/execute-tdd/SKILL.md   → .skills/execute-tdd/SKILL.md
+~/.config/opencode/skills/execute-tdd/SKILL.md  → .skills/execute-tdd/SKILL.md
+# ... same for every agent and every skill
 ```
+
+When an agent starts, it reads its skills directory and registers each skill as available context. The `description` field tells the agent when to invoke a skill automatically.
+
+### 2. Commands (slash invocation)
+
+`setup.sh` also generates **real command files** (not symlinks) in each agent's commands directory. The file name determines the slash command — not the frontmatter:
+
+```
+~/.claude/commands/superspecs/ship.md        →  /superspecs:ship   (Claude Code)
+~/.config/opencode/commands/superspecs-ship.md  →  /superspecs-ship   (OpenCode)
+```
+
+Generated command files contain only a `description` frontmatter field and the skill body. The SKILL.md-specific fields (`slash_command`, `name`, `phase`) are intentionally stripped.
+
+```
+# ~/.claude/commands/superspecs/ship.md (generated)
+---
+description: Create the PR, write the changelog...
+---
+
+# Skill: ship
+You are shipping the feature...
+```
+
+**Command naming by agent:**
+
+| Agent | Format | Example |
+|---|---|---|
+| Claude Code | `/superspecs:<cmd>` (subdir namespace) | `/superspecs:ship` |
+| OpenCode | `/superspecs-<cmd>` (flat prefix) | `/superspecs-ship` |
+
+> OpenCode does not support colon namespacing in command names.
 
 ---
 
 ## Bootstrap Files
 
-Beyond skills, each agent also gets a **bootstrap file** that is loaded at the start of every session. These prime the agent with the lifecycle summary so it behaves correctly even before a slash command is issued.
+Beyond skills and commands, each agent also gets a **bootstrap file** that is loaded at the start of every session. These prime the agent with the lifecycle summary so it behaves correctly even before a slash command is issued.
 
 | File | Agent | Mechanism |
 |---|---|---|
@@ -86,29 +107,40 @@ Bootstrap files are short — they contain the lifecycle diagram, the slash comm
 
 ## The Four-Phase Lifecycle
 
+### Phase 0 — Setup
+
+**Goal:** Ground every future session with a permanent stack profile.
+
+```
+/superspecs:techstack  →  wiki/techstack.md   (stack + recommended skills)
+```
+
 ### Phase 1 — Plan
 
 **Goal:** Produce a spec that fits a fresh 200k-token context window.
 
 ```
-/discuss  →  DISCUSS.md   (decisions, constraints, non-goals)
-/spec     →  spec.md      (SHALL requirements + GIVEN/WHEN/THEN scenarios)
-              tasks.md    (implementation task list)
-              status.md   (phase tracker)
+/superspecs:discuss  →  DISCUSS.md   (decisions, constraints, non-goals)
+/superspecs:spec     →  spec.md      (SHALL requirements + GIVEN/WHEN/THEN scenarios)
+                         tasks.md    (implementation task list)
+                         status.md   (phase tracker)
+/superspecs:grill    →  GRILL.md     (verdict: READY or NEEDS REVISION)
 ```
 
 The 200k window constraint is deliberate: any executor (subagent, fresh session, different agent) must be able to pick up the spec and work from it without needing prior chat history. If a spec is too large to fit, it is decomposed into smaller specs.
+
+A spec that hasn't passed `/superspecs:grill` does not proceed to execution.
 
 ### Phase 2 — Execute
 
 **Goal:** Implement the spec in parallel using isolated subagents, with TDD enforced at every step.
 
 ```
-/pick-spec  →  Validates spec completeness; creates phases/<slug>-execute/plan.md
-/branch     →  git branch or worktree; one branch per spec
-/subagent   →  Fresh subagent per task; wave-based dispatch; human checkpoints
-/tdd        →  RED (failing test) → GREEN (minimal code) → REFACTOR → commit
-/code-review →  Spec compliance then code quality; Critical findings block progress
+/superspecs:pick-spec    Validates spec completeness; creates phases/<slug>-execute/plan.md
+/superspecs:branch       git branch or worktree; one branch per spec
+/superspecs:subagent     Fresh subagent per task; wave-based dispatch; human checkpoints
+/superspecs:tdd          RED (failing test) → GREEN (minimal code) → REFACTOR → commit
+/superspecs:code-review  Spec compliance then code quality; Critical findings block progress
 ```
 
 Each subagent receives: the spec, its task, and nothing else. No shared state. No reliance on context from other agents. This is what makes parallel execution safe.
@@ -118,8 +150,8 @@ Each subagent receives: the spec, its task, and nothing else. No shared state. N
 **Goal:** Confirm the implementation matches the spec and the knowledge is preserved.
 
 ```
-/check-tests  →  Full suite run; every spec scenario covered by a test; no skips
-/wiki         →  Distill to superspec/wiki/<domain>/<topic>.md
+/superspecs:check-tests  Full suite run; every spec scenario covered by a test; no skips
+/superspecs:wiki         Distill to superspec/wiki/<domain>/<topic>.md
 ```
 
 The wiki is a living knowledge base — architecture decisions, patterns, trade-offs, gotchas. It survives after the session ends and informs future planning.
@@ -129,10 +161,10 @@ The wiki is a living knowledge base — architecture decisions, patterns, trade-
 **Goal:** Merge and close the loop.
 
 ```
-/ship  →  PR creation; changelog entry; phase directory archived; spec marked complete
+/superspecs:ship  →  PR creation; changelog entry; phase directory archived; spec marked complete
 ```
 
-After `/ship`, the cycle resets: `/pick-spec` for the next item.
+After `/superspecs:ship`, the cycle resets: `/superspecs:pick-spec` for the next item.
 
 ---
 
@@ -146,6 +178,7 @@ superspec/
 │   └── <slug>/
 │       ├── DISCUSS.md      ← pre-planning decisions
 │       ├── spec.md         ← SHALL requirements + scenarios
+│       ├── GRILL.md        ← grill verdict + open questions
 │       ├── tasks.md        ← task list for /subagent
 │       └── status.md       ← phase tracker + checklist
 │
@@ -179,30 +212,39 @@ These are enforced by the skills and bootstrap files. Agents are instructed to r
 
 | Rule | Enforcement |
 |---|---|
-| No implementation code before a failing test | `/tdd` deletes code written before tests |
-| Critical code-review findings block all progress | `/code-review` reports severity; Critical = hard stop |
-| Spec must fit a fresh 200k-token context window | `/spec` and `/pick-spec` both check this |
-| Every shipped feature → wiki page | `/ship` requires `/wiki` to have run first |
+| No implementation code before a failing test | `/superspecs:tdd` deletes code written before tests |
+| Critical code-review findings block all progress | `/superspecs:code-review` reports severity; Critical = hard stop |
+| Spec must fit a fresh 200k-token context window | `/superspecs:spec` and `/superspecs:pick-spec` both check this |
+| Every shipped feature → wiki page | `/superspecs:ship` requires `/superspecs:wiki` to have run first |
 
 ---
 
 ## The CLI
 
-`bin/superspecs.js` is a thin Node.js wrapper with a single command:
+`bin/superspecs.js` is a thin Node.js wrapper around `setup.sh`:
 
 ```bash
-superspecs install   # runs setup.sh
+superspecs install   # symlink skills + generate command files into all agent dirs
+superspecs init      # init superspec/ directory structure only (no agent symlinking)
+superspecs version   # print version
+superspecs help      # show help
 ```
 
-It exists so the framework can be distributed and installed via npm. All real logic is in `setup.sh` and the `.skills/` Markdown files.
+```bash
+npx superspecs install   # run without a global install
+```
+
+All real logic lives in `setup.sh` and the `.skills/` Markdown files.
 
 ---
 
 ## Creating a New Skill
 
-The `skill-creator` meta-skill documents the process. In short:
+The `/superspecs:skill-creator` meta-skill documents the full process. In short:
 
 1. Create `.skills/<name>/SKILL.md` with YAML frontmatter (`name`, `description`, `slash_command`, `phase`)
 2. Write the step-by-step instructions in the body
-3. Run `bash setup.sh` to symlink the new skill into all agent directories
+3. Run `bash setup.sh` (or `superspecs install`) to:
+   - Symlink the skill into all agent skill directories (auto-discovery)
+   - Generate a clean command file in each agent's commands directory (slash invocation)
 4. Open your agent and invoke the new slash command to test it
