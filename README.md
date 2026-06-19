@@ -157,22 +157,22 @@ Create a git branch or worktree for isolated execution. One branch per spec.
 
 ### 2.3 Subagent Development (`/superspecs:subagent`)
 
-Dispatches a fresh subagent per task. Each gets: the spec, the task, and nothing else. Two-stage review per task: spec compliance first, code quality second. Supports batch mode with human checkpoints between waves.
+Dispatches a fresh subagent per task. Each gets: the spec, the task, and nothing else. **TDD runs inside each task** — every subagent follows RED → GREEN → REFACTOR before a task is considered done. Two-stage review after each task: spec compliance first, code quality second. Supports wave mode with human checkpoints between waves, or batch mode.
 
-### 2.4 TDD (`/superspecs:tdd`)
+The cycle per task:
+1. Write a failing test — watch it fail for the right reason (RED)
+2. Write minimal code — watch it pass (GREEN)
+3. Refactor — clean up while tests stay green (REFACTOR)
+4. Commit
+5. Code review (spec compliance → code quality)
 
-Enforces RED → GREEN → REFACTOR strictly:
+Code written before a failing test gets deleted.
 
-1. Write a failing test — watch it fail for the right reason
-2. Write minimal code — watch it pass
-3. Commit
-4. Code written before a failing test gets deleted
-
-### 2.5 Code Review (`/superspecs:code-review`)
+### 2.4 Code Review (`/superspecs:code-review`)
 
 Runs between tasks. Reviews against the spec. Reports issues by severity. **Critical issues block all progress** — nothing moves forward until resolved.
 
-**Skills:** `/superspecs:pick-spec` → `/superspecs:branch` → `/superspecs:subagent` → `/superspecs:tdd` → `/superspecs:code-review`
+**Skills:** `/superspecs:pick-spec` → `/superspecs:branch` → `/superspecs:subagent` (with TDD per task) → `/superspecs:code-review`
 
 ---
 
@@ -188,9 +188,22 @@ Full test suite. Coverage check. Every spec scenario verified by a test. No pass
 
 Distill the implemented feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session — it's what makes the next planning cycle start informed instead of blind. Structured, linked, searchable. Not chat history: a real knowledge base.
 
+This follows the **Karpathy LLM Wiki pattern**: compile raw sources once into structured, interlinked markdown pages. Future sessions query the compiled wiki — not the raw specs. Compile once, query fast. Knowledge compounds.
+
+```
+superspec/wiki/raw/   ← drop source material here (agent reads, never edits)
+superspec/wiki/       ← compiled knowledge base (agent writes on ingest)
+superspec/wiki/log.md ← append-only activity log
+```
+
 The wiki at `superspec/wiki/` is an **Obsidian vault**. Open it directly in Obsidian for graph view, backlinks, tag search, and hover previews.
 
 **Skills:** `/superspecs:check-tests` → `/superspecs:wiki`
+
+### Wiki Operations (any time)
+
+- **`/superspecs:wiki-query`** — query the compiled wiki for an answer. Reads `wiki/` only — never raw specs. Optionally files the answer back as a new wiki page.
+- **`/superspecs:wiki-lint`** — health check: finds orphaned pages, broken wikilinks, missing cross-links, contradictions, and stale file references.
 
 ---
 
@@ -281,6 +294,8 @@ your-project/
 │   ├── execute-review/SKILL.md
 │   ├── verify-tests/SKILL.md
 │   ├── verify-wiki/SKILL.md
+│   ├── wiki-lint/SKILL.md
+│   ├── wiki-query/SKILL.md
 │   ├── ship/SKILL.md
 │   └── skill-creator/SKILL.md
 │
@@ -308,7 +323,9 @@ your-project/
 | Execute | `execute-tdd`       | `/superspecs:tdd`            | RED-GREEN-REFACTOR enforcement                                               |
 | Execute | `execute-review`    | `/superspecs:code-review`    | Between-task spec + quality review                                           |
 | Verify  | `verify-tests`      | `/superspecs:check-tests`    | Full suite + scenario coverage                                               |
-| Verify  | `verify-wiki`       | `/superspecs:wiki`           | Distill feature to wiki                                                      |
+| Verify  | `verify-wiki`       | `/superspecs:wiki`           | Compile feature to wiki (ingest)                                             |
+| Wiki    | `wiki-query`        | `/superspecs:wiki-query`     | Query compiled wiki; optionally file answer back as a page                   |
+| Wiki    | `wiki-lint`         | `/superspecs:wiki-lint`      | Health check: orphans, broken links, contradictions, stale refs              |
 | Ship    | `ship`              | `/superspecs:ship`           | PR + archive + next cycle                                                    |
 | Meta    | `skill-creator`     | `/superspecs:skill-creator`  | Create a new SuperSpecs skill to extend the framework                        |
 
@@ -322,7 +339,7 @@ your-project/
 
 **Critical issues block progress.** A `/code-review` finding rated Critical is not a suggestion. Nothing moves forward until it's resolved.
 
-**Knowledge outlives the session.** After every shipped feature, the wiki gains a page. Future planning sessions start informed.
+**Knowledge outlives the session.** The wiki uses the Karpathy LLM Wiki pattern: raw sources are compiled once into structured, interlinked pages. Future sessions query the wiki — not the raw specs. Knowledge compounds; problems stay solved.
 
 **One branch per spec.** Isolation prevents interference between parallel workstreams.
 

@@ -328,10 +328,40 @@ plugins/*/data.json
 OGIEOF
 fi
 
+# ── Wiki 3-layer structure (Karpathy LLM Wiki pattern) ────────────────────
+# raw/  — immutable source material (agent reads, never modifies)
+# wiki/ — compiled knowledge base (agent writes on ingest/query/lint-fix)
+# .skills/verify-wiki/SKILL.md — schema / operating rules
+
+mkdir -p "$PROJECT_DIR/superspec/wiki/raw"
+
+# raw/.gitkeep so the folder is tracked in git
+if [ ! -f "$PROJECT_DIR/superspec/wiki/raw/.gitkeep" ]; then
+  touch "$PROJECT_DIR/superspec/wiki/raw/.gitkeep"
+fi
+
+# raw/README.md — instructions for humans dropping in source material
+if [ ! -f "$PROJECT_DIR/superspec/wiki/raw/README.md" ]; then
+cat > "$PROJECT_DIR/superspec/wiki/raw/README.md" << 'RAWEOF'
+# raw/ — Source Material
+
+Drop articles, PDFs, bookmarks, meeting notes, and external docs here.
+
+**Rules:**
+- Agent reads this folder but never edits or deletes files here.
+- You commit these files; the agent compiles them into `../` (the wiki).
+- To compile a raw document: `/superspecs:wiki-ingest <filename>`
+- To compile a completed spec: `/superspecs:wiki <slug>`
+
+Supported: `.md`, `.txt`, `.pdf` (text-extractable)
+RAWEOF
+fi
+
 # ── Wiki home page ─────────────────────────────────────────────────────────
 
-if [ ! -f "$PROJECT_DIR/superspec/wiki/Home.md" ]; then
 TODAY=$(date +%Y-%m-%d 2>/dev/null || echo "")
+
+if [ ! -f "$PROJECT_DIR/superspec/wiki/Home.md" ]; then
 cat > "$PROJECT_DIR/superspec/wiki/Home.md" << HOMEEOF
 ---
 title: Wiki Home
@@ -341,22 +371,60 @@ updated: $TODAY
 
 # Project Wiki
 
-Knowledge base distilled from shipped features — architecture decisions, patterns, trade-offs, gotchas.
+Compiled knowledge base — architecture decisions, patterns, trade-offs, gotchas.
 
 > **Obsidian vault** — open \`superspec/wiki/\` in [Obsidian](https://obsidian.md) for graph view, backlinks, tag search, and hover previews.
 
 ## Domains
 
-_(domains created automatically by \`/superspecs:wiki\` as features ship)_
+| Domain | Description | Last updated |
+|--------|-------------|-------------|
+
+_(domains added automatically by \`/superspecs:wiki\` as features ship)_
 
 ## Recent Updates
 
-_(updated by \`/superspecs:wiki\` after each shipped feature)_
+_(last 10 entries — full history in [[log]])_
+
+---
+
+## Wiki Operations
+
+| Command | What it does |
+|---------|-------------|
+| \`/superspecs:wiki <slug>\` | Compile a shipped spec into wiki pages |
+| \`/superspecs:wiki-query\` | Query the compiled wiki |
+| \`/superspecs:wiki-lint\` | Health check: orphans, broken links, contradictions |
 
 ---
 
 _Maintained by [SuperSpecs](https://github.com/fokkerone/superspecs)_
 HOMEEOF
+fi
+
+# ── Wiki log (append-only activity log) ───────────────────────────────────
+
+if [ ! -f "$PROJECT_DIR/superspec/wiki/log.md" ]; then
+cat > "$PROJECT_DIR/superspec/wiki/log.md" << LOGEOF
+---
+title: Wiki Log
+tags: [log, activity]
+---
+
+# Wiki Log
+
+Append-only activity log. Every ingest, query, and lint run appends an entry here.
+
+> grep-friendly: \`grep "## \[" log.md\` lists all events
+
+---
+
+## [$TODAY] init | Wiki initialized
+
+- Structure: \`raw/\` (sources) + \`wiki/\` (compiled) + \`.skills/verify-wiki/SKILL.md\` (schema)
+- Vault ready to open in Obsidian
+
+LOGEOF
 fi
 
 if [ ! -f "$PROJECT_DIR/superspec/wiki/_manifest.json" ]; then

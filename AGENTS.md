@@ -20,16 +20,29 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 **Phase 2 — Execute**
 - `/superspecs:pick-spec` — validate spec, check context fit
 - `/superspecs:branch` — create branch/worktree
-- `/superspecs:subagent` — fresh subagent per task, two-stage review
-- `/superspecs:tdd` — RED-GREEN-REFACTOR, no exceptions
+- `/superspecs:subagent` — fresh subagent per task; RED→GREEN→REFACTOR TDD runs inside each task
+- `/superspecs:tdd` — invoke directly if writing code outside of subagent mode
 - `/superspecs:code-review` — critical issues block progress
 
 **Phase 3 — Verify**
 - `/superspecs:check-tests` — full suite, every scenario covered
-- `/superspecs:wiki` — distill to knowledge base
+- `/superspecs:wiki` — compile feature to wiki (ingest)
 
 **Phase 4 — Ship**
 - `/superspecs:ship` — PR, archive, next cycle
+
+## Wiki Operations (run any time)
+- `/superspecs:wiki-query` — query the compiled wiki; answer stays in context or files back as a page
+- `/superspecs:wiki-lint` — health check: orphans, broken links, contradictions, stale refs
+
+## Wiki Architecture (Karpathy LLM Wiki pattern)
+```
+superspec/wiki/raw/   ← immutable source material (agent reads, never edits)
+superspec/wiki/       ← compiled knowledge base (agent writes)
+superspec/wiki/log.md ← append-only activity log
+.skills/verify-wiki/  ← schema: how to ingest, link, and format
+```
+Compile once → query fast. The agent reads `wiki/`, not `raw/`, at query time.
 
 ## Rules
 - No implementation code before a failing test
@@ -37,9 +50,12 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 - Spec must fit a fresh 200k context window
 - Spec must pass grill before execution
 - Every shipped feature → wiki page
+- Wiki query reads compiled `wiki/` only — never raw specs
 
 ## Paths
 - `superspec/specs/` — specs + DISCUSS.md files
 - `superspec/phases/` — execution working dirs
-- `superspec/wiki/` — knowledge base
-- `.skills/` — skill definitions
+- `superspec/wiki/raw/` — immutable source material
+- `superspec/wiki/` — compiled knowledge base (Obsidian vault)
+- `superspec/wiki/log.md` — append-only activity log
+- `.skills/` — skill definitions (schema layer)

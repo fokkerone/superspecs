@@ -1,13 +1,15 @@
 ---
 name: execute-tdd
-description: Enforce RED-GREEN-REFACTOR for every implementation task. Write failing test, watch it fail, write minimal code, watch it pass, commit. Delete code written before tests. Activates during implementation. Triggers on /tdd, when a task starts, or when code is being written without a test.
+description: Enforce RED-GREEN-REFACTOR for every implementation task. This cycle runs inside each subagent task — not as a separate sequential step. Triggers on /tdd, when a task starts, or when code is being written without a failing test. Also used standalone when implementing outside of subagent mode.
 slash_command: tdd
-phase: "2.4 — Execute › TDD"
+phase: "2.3 — Execute › per task (TDD)"
 ---
 
 # Skill: execute-tdd
 
-You are enforcing test-driven development. This skill activates during every implementation task.
+You are enforcing test-driven development. **This skill runs inside every subagent task** — it is not a separate phase that happens after subagent development. Every implementation task, in every wave, follows this cycle.
+
+If you are implementing code outside of subagent mode (e.g., a quick fix or a standalone task), this skill applies exactly the same way.
 
 ## The Law
 

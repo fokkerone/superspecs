@@ -133,17 +133,26 @@ A spec that hasn't passed `/superspecs:grill` does not proceed to execution.
 
 ### Phase 2 — Execute
 
-**Goal:** Implement the spec in parallel using isolated subagents, with TDD enforced at every step.
+**Goal:** Implement the spec in parallel using isolated subagents, with TDD enforced inside every task.
 
 ```
 /superspecs:pick-spec    Validates spec completeness; creates phases/<slug>-execute/plan.md
 /superspecs:branch       git branch or worktree; one branch per spec
-/superspecs:subagent     Fresh subagent per task; wave-based dispatch; human checkpoints
-/superspecs:tdd          RED (failing test) → GREEN (minimal code) → REFACTOR → commit
+/superspecs:subagent     Fresh subagent per task; TDD per task; wave dispatch; human checkpoints
 /superspecs:code-review  Spec compliance then code quality; Critical findings block progress
 ```
 
 Each subagent receives: the spec, its task, and nothing else. No shared state. No reliance on context from other agents. This is what makes parallel execution safe.
+
+**TDD is not a separate step after subagent development.** Every subagent task follows RED → GREEN → REFACTOR before it is considered done. The `/superspecs:tdd` skill defines the cycle; it runs inside every task dispatched by `/superspecs:subagent`.
+
+The per-task cycle:
+1. Write a failing test — confirm it fails for the right reason (RED)
+2. Write minimum code — confirm it passes (GREEN)
+3. Refactor — clean up while tests stay green (REFACTOR)
+4. Run the full suite — no regressions
+5. Commit
+6. Code review: spec compliance first, then code quality
 
 ### Phase 3 — Verify
 
@@ -151,10 +160,17 @@ Each subagent receives: the spec, its task, and nothing else. No shared state. N
 
 ```
 /superspecs:check-tests  Full suite run; every spec scenario covered by a test; no skips
-/superspecs:wiki         Distill to superspec/wiki/<domain>/<topic>.md
+/superspecs:wiki         Compile feature → superspec/wiki/<domain>/<topic>.md
 ```
 
-The wiki is a living knowledge base — architecture decisions, patterns, trade-offs, gotchas. It survives after the session ends and informs future planning.
+The wiki implements the **Karpathy LLM Wiki pattern**: raw sources are compiled once into structured, interlinked markdown pages. Future sessions query the compiled wiki — never the raw specs. The agent compiles once; queries are fast and accurate.
+
+```
+superspec/wiki/raw/   ← immutable source material (agent reads, never edits)
+superspec/wiki/       ← compiled knowledge base (agent writes on ingest)
+superspec/wiki/log.md ← append-only activity log (grep-friendly)
+.skills/verify-wiki/  ← schema: how to ingest, link, and format
+```
 
 #### The wiki as an Obsidian vault
 
@@ -166,7 +182,9 @@ superspec/wiki/
 │   ├── app.json            ← wikilinks on, attachment folder set
 │   ├── core-plugins.json   ← graph, backlinks, tag pane, search enabled
 │   └── .gitignore          ← workspace + cache excluded from git
+├── raw/                    ← source material (drop articles, PDFs, notes here)
 ├── Home.md                 ← vault home page (updated by /wiki)
+├── log.md                  ← append-only activity log
 ├── _manifest.json          ← machine-readable ingestion log
 └── <domain>/
     ├── Home.md             ← domain index
@@ -180,8 +198,23 @@ The `/superspecs:wiki` skill writes every page with:
 - YAML frontmatter: `tags`, `created`, `updated`, `spec` (links back to the source spec)
 - Domain `Home.md` index files for each folder
 - Entries in the vault-wide `Home.md` under Recent Updates
+- An entry appended to `log.md`
 
 The shared config (`app.json`, `core-plugins.json`) is committed so every team member opens the vault with the same settings. User-specific state (`workspace.json`, `cache`, plugin data) is gitignored.
+
+#### Wiki Operations (any time)
+
+**`/superspecs:wiki-query`** — Query the compiled wiki for an answer. The agent reads `wiki/` only — not raw specs, not source code. Optionally files the synthesized answer back as a new wiki page.
+
+**`/superspecs:wiki-lint`** — Periodic health check. Finds:
+- Orphaned pages (no inbound wikilinks)
+- Broken `[[wikilinks]]` (target page missing)
+- Missing cross-links (page mentions a topic but doesn't link to its page)
+- Contradictions (two pages make conflicting claims)
+- Stale file references (backtick paths that no longer exist)
+- Missing frontmatter fields
+
+Produces `superspec/wiki/_lint-report.md`. Offers to auto-fix safe issues; contradictions always require human review.
 
 ### Phase 4 — Ship
 
