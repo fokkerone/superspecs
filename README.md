@@ -15,6 +15,7 @@
 
 **Spec-driven planning. Parallel TDD execution. A wiki that never forgets.**
 
+[![npm](https://img.shields.io/npm/v/superspecs)](https://www.npmjs.com/package/superspecs)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Works with: Claude Code · Cursor · OpenCode · Copilot · Codex · Gemini CLI](https://img.shields.io/badge/agents-Claude%20Code%20·%20Cursor%20·%20OpenCode%20·%20Copilot-blue)]()
 
@@ -105,7 +106,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 
 Define the project's tech stack through a guided questionnaire. Get concrete recommendations for specialist skills to install, ecosystem libraries per domain, and a production-readiness checklist tailored to your stack. Also fetches and filters the [awesome-skills.com](https://awesome-skills.com/) community directory live — surfacing the highest-starred, best-matched skills for your stack, with a curated fallback if unavailable. Saves a permanent profile to the wiki that every future session can reference.
 
-**Skills:** `/techstack`
+**Skills:** `/superspecs:techstack`
 
 ---
 
@@ -138,7 +139,7 @@ Output: `superspec/specs/<slug>/GRILL.md` + any required updates to `spec.md`.
 
 **Exit criterion:** verdict is READY. A spec that hasn't been grilled does not proceed to execution.
 
-**Skills:** `/discuss` → `/spec` → `/grill`
+**Skills:** `/superspecs:discuss` → `/superspecs:spec` → `/superspecs:grill`
 
 ---
 
@@ -171,7 +172,7 @@ Enforces RED → GREEN → REFACTOR strictly:
 
 Runs between tasks. Reviews against the spec. Reports issues by severity. **Critical issues block all progress** — nothing moves forward until resolved.
 
-**Skills:** `/pick-spec` → `/branch` → `/subagent` → `/tdd` → `/code-review`
+**Skills:** `/superspecs:pick-spec` → `/superspecs:branch` → `/superspecs:subagent` → `/superspecs:tdd` → `/superspecs:code-review`
 
 ---
 
@@ -187,7 +188,7 @@ Full test suite. Coverage check. Every spec scenario verified by a test. No pass
 
 Distill the implemented feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session — it's what makes the next planning cycle start informed instead of blind. Structured, linked, searchable. Not chat history: a real knowledge base.
 
-**Skills:** `/check-tests` → `/wiki`
+**Skills:** `/superspecs:check-tests` → `/superspecs:wiki`
 
 ---
 
@@ -197,40 +198,45 @@ Distill the implemented feature into the project wiki. Architecture decisions, p
 
 Create the PR. Write a changelog entry. Archive the phase directory. Mark the spec complete. Trigger the next cycle.
 
-**Skills:** `/ship`
+**Skills:** `/superspecs:ship`
 
 ---
 
 ## Quick Start
 
 ```bash
-# Install
-git clone git@github.com:fokkerone/superspecs.git
-cd your-project
-bash ~/.superspecs/setup.sh   # symlinks skills into all your agents
+# Install globally
+npm install -g superspecs
 
-# Or per-project
-git clone git@github.com:fokkerone/superspecs.git .superspecs
-bash .superspecs/setup.sh
+# Run in your project to symlink skills into all your AI agents
+cd your-project
+superspecs install
+
+# Or without a global install
+npx superspecs install
 ```
 
 Then open your agent and say: **"Tell me about your superspecs"**
 
+> **Command format by agent**
+> - Claude Code / Cursor: `/superspecs:techstack`
+> - OpenCode / Aider: `/superspecs-techstack`
+
 ### First feature
 
 ```
-/superspecs:techstack  Define stack, get skill & library recommendations
-/superspecs:discuss    What are we building and why?
-/superspecs:spec       Write the spec
-/superspecs:grill      Stress-test spec against wiki + techstack
-/superspecs:pick-spec  Confirm it fits a clean context
-/superspecs:branch     Create worktree
-/superspecs:subagent   Start execution
-/superspecs:tdd        Enforce RED-GREEN-REFACTOR
+/superspecs:techstack    Define stack, get skill & library recommendations
+/superspecs:discuss      What are we building and why?
+/superspecs:spec         Write the spec
+/superspecs:grill        Stress-test spec against wiki + techstack
+/superspecs:pick-spec    Confirm it fits a clean context
+/superspecs:branch       Create worktree
+/superspecs:subagent     Start execution
+/superspecs:tdd          Enforce RED-GREEN-REFACTOR
 /superspecs:code-review  Check between tasks
 /superspecs:check-tests  Verify everything passes
-/superspecs:wiki       Distill to knowledge base
-/superspecs:ship       PR + archive
+/superspecs:wiki         Distill to knowledge base
+/superspecs:ship         PR + archive
 ```
 
 ---
@@ -284,20 +290,21 @@ your-project/
 
 ## Skill Reference
 
-| Phase   | Skill               | Command        | What it does                                                                 |
-| ------- | ------------------- | -------------- | ---------------------------------------------------------------------------- |
-| Setup   | `techstack`         | `/techstack`   | Questionnaire: define stack, recommend skills & libraries, save wiki profile |
-| Plan    | `plan-discuss`      | `/discuss`     | Capture decisions before planning                                            |
-| Plan    | `plan-spec`         | `/spec`        | Write OpenSpec-style spec                                                    |
-| Plan    | `plan-grill`        | `/grill`       | Stress-test spec against wiki + techstack, blocks execution until READY      |
-| Execute | `execute-pick-spec` | `/pick-spec`   | Choose + validate next spec                                                  |
-| Execute | `execute-branch`    | `/branch`      | Create branch / worktree                                                     |
-| Execute | `execute-subagent`  | `/subagent`    | Parallel subagent task execution                                             |
-| Execute | `execute-tdd`       | `/tdd`         | RED-GREEN-REFACTOR enforcement                                               |
-| Execute | `execute-review`    | `/code-review` | Between-task spec + quality review                                           |
-| Verify  | `verify-tests`      | `/check-tests` | Full suite + scenario coverage                                               |
-| Verify  | `verify-wiki`       | `/wiki`        | Distill feature to wiki                                                      |
-| Ship    | `ship`              | `/ship`        | PR + archive + next cycle                                                    |
+| Phase   | Skill               | Command                      | What it does                                                                 |
+| ------- | ------------------- | ---------------------------- | ---------------------------------------------------------------------------- |
+| Setup   | `techstack`         | `/superspecs:techstack`      | Questionnaire: define stack, recommend skills & libraries, save wiki profile |
+| Plan    | `plan-discuss`      | `/superspecs:discuss`        | Capture decisions before planning                                            |
+| Plan    | `plan-spec`         | `/superspecs:spec`           | Write OpenSpec-style spec                                                    |
+| Plan    | `plan-grill`        | `/superspecs:grill`          | Stress-test spec against wiki + techstack, blocks execution until READY      |
+| Execute | `execute-pick-spec` | `/superspecs:pick-spec`      | Choose + validate next spec                                                  |
+| Execute | `execute-branch`    | `/superspecs:branch`         | Create branch / worktree                                                     |
+| Execute | `execute-subagent`  | `/superspecs:subagent`       | Parallel subagent task execution                                             |
+| Execute | `execute-tdd`       | `/superspecs:tdd`            | RED-GREEN-REFACTOR enforcement                                               |
+| Execute | `execute-review`    | `/superspecs:code-review`    | Between-task spec + quality review                                           |
+| Verify  | `verify-tests`      | `/superspecs:check-tests`    | Full suite + scenario coverage                                               |
+| Verify  | `verify-wiki`       | `/superspecs:wiki`           | Distill feature to wiki                                                      |
+| Ship    | `ship`              | `/superspecs:ship`           | PR + archive + next cycle                                                    |
+| Meta    | `skill-creator`     | `/superspecs:skill-creator`  | Create a new SuperSpecs skill to extend the framework                        |
 
 ---
 
