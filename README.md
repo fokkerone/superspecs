@@ -205,12 +205,12 @@ Create the PR. Write a changelog entry. Archive the phase directory. Mark the sp
 
 ```bash
 # Install
-git clone https://github.com/your-org/superspecs.git
+git clone git@github.com:fokkerone/superspecs.git
 cd your-project
 bash ~/.superspecs/setup.sh   # symlinks skills into all your agents
 
 # Or per-project
-git clone https://github.com/your-org/superspecs.git .superspecs
+git clone git@github.com:fokkerone/superspecs.git .superspecs
 bash .superspecs/setup.sh
 ```
 
