@@ -75,7 +75,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  Critical findings block all progress.              │
 ├─────────────────────────────────────────────────────┤
 │  /pick-spec  →  /branch  →  /subagent               │
-│  /tdd  →  /code-review                              │
+│  (TDD per task)  →  /code-review                    │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -248,8 +248,8 @@ Then open your agent and say: **"Tell me about your superspecs"**
 /superspecs:grill        Stress-test spec against wiki + techstack
 /superspecs:pick-spec    Confirm it fits a clean context
 /superspecs:branch       Create worktree
-/superspecs:subagent     Start execution
-/superspecs:tdd          Enforce RED-GREEN-REFACTOR
+/superspecs:subagent     Start execution (TDD runs inside each task)
+/superspecs:tdd          Standalone: enforce RED-GREEN-REFACTOR outside subagent
 /superspecs:code-review  Check between tasks
 /superspecs:check-tests  Verify everything passes
 /superspecs:wiki         Distill to knowledge base
@@ -320,7 +320,7 @@ your-project/
 | Execute | `execute-pick-spec` | `/superspecs:pick-spec`      | Choose + validate next spec                                                  |
 | Execute | `execute-branch`    | `/superspecs:branch`         | Create branch / worktree                                                     |
 | Execute | `execute-subagent`  | `/superspecs:subagent`       | Parallel subagent task execution                                             |
-| Execute | `execute-tdd`       | `/superspecs:tdd`            | RED-GREEN-REFACTOR enforcement                                               |
+| Execute | `execute-tdd`       | `/superspecs:tdd`            | RED-GREEN-REFACTOR — runs inside each subagent task; invoke standalone for code outside subagent mode |
 | Execute | `execute-review`    | `/superspecs:code-review`    | Between-task spec + quality review                                           |
 | Verify  | `verify-tests`      | `/superspecs:check-tests`    | Full suite + scenario coverage                                               |
 | Verify  | `verify-wiki`       | `/superspecs:wiki`           | Compile feature to wiki (ingest)                                             |

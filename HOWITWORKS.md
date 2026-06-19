@@ -29,7 +29,7 @@ Each `SKILL.md` starts with a YAML frontmatter block:
 name: execute-tdd
 description: Enforce RED → GREEN → REFACTOR with no exceptions
 slash_command: tdd
-phase: "2.4"
+phase: "2.3 — Execute › per task (TDD)"
 ---
 ```
 
