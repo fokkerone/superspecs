@@ -18,6 +18,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Works with: Claude Code · Cursor · OpenCode · Copilot · Codex · Gemini CLI](https://img.shields.io/badge/agents-Claude%20Code%20·%20Cursor%20·%20OpenCode%20·%20Copilot-blue)]()
 
+[How It Works](HOWITWORKS.md) · [Local Development](LOCALDEVELOPMENT.md)
+
 ---
 
 ## The Four Phases
