@@ -1,4 +1,17 @@
-# SuperSpecs 🚀
+```
+   ________  ________  ________  ________  ________
+  ╱        ╲╱    ╱   ╲╱        ╲╱        ╲╱        ╲
+ ╱        _╱         ╱         ╱         ╱         ╱
+╱-        ╱         ╱       __╱        _╱        _╱
+╲_______╱╱╲________╱╲______╱  ╲________╱╲____╱___╱
+         ________  ________  ________  ________  ________
+        ╱        ╲╱        ╲╱        ╲╱        ╲╱        ╲
+       ╱        _╱         ╱         ╱         ╱        _╱
+      ╱-        ╱       __╱        _╱       --╱-        ╱
+      ╲_______╱╱╲______╱  ╲________╱╲________╱╲________╱
+```
+
+# SuperSpecs
 
 **A unified AI development framework: spec-driven planning → parallel TDD execution → verified shipping — with living wiki memory.**
 
@@ -10,24 +23,26 @@
 ## The Four Phases
 
 ```
+
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                        SUPERSPEC LIFECYCLE                              │
-│                                                                         │
-│  1 ── PLAN                  2 ── EXECUTE                               │
-│  ─────────────────          ──────────────────────────────             │
-│  /discuss                   /pick-spec                                  │
-│    Capture decisions   →    /branch          → fresh worktree           │
-│  /spec                      /subagent         → parallel tasks          │
-│    Write spec          →    /tdd              → RED-GREEN-REFACTOR      │
-│    Fits 200k window         /code-review      → block on critical       │
-│                                                                         │
-│  3 ── VERIFY                4 ── SHIP                                  │
-│  ─────────────────          ──────────────────────────────             │
-│  /check-tests               /ship                                       │
-│    All green?          →      Create PR                                 │
-│  /wiki                        Archive phase                             │
-│    Distill knowledge          Repeat for next spec                      │
+│ SUPERSPEC LIFECYCLE │
+│ │
+│ 1 ── PLAN 2 ── EXECUTE │
+│ ───────────────── ────────────────────────────── │
+│ /discuss /pick-spec │
+│ Capture decisions → /branch → fresh worktree │
+│ /spec /subagent → parallel tasks │
+│ Write spec → /tdd → RED-GREEN-REFACTOR │
+│ Fits 200k window /code-review → block on critical │
+│ │
+│ 3 ── VERIFY 4 ── SHIP │
+│ ───────────────── ────────────────────────────── │
+│ /check-tests /ship │
+│ All green? → Create PR │
+│ /wiki Archive phase │
+│ Distill knowledge Repeat for next spec │
 └─────────────────────────────────────────────────────────────────────────┘
+
 ```
 
 ---
@@ -37,9 +52,11 @@
 Before any code exists, the plan must fit in a fresh 200k-token context window. This discipline ensures every executor starts clean.
 
 ### 1.1 Discuss (`/discuss`)
-Capture implementation decisions *before* anything is planned. Goals, constraints, open questions, non-goals. The output is a `DISCUSS.md` — the foundation for the spec.
+
+Capture implementation decisions _before_ anything is planned. Goals, constraints, open questions, non-goals. The output is a `DISCUSS.md` — the foundation for the spec.
 
 ### 1.2 Spec (`/spec`)
+
 Write an OpenSpec-style spec from the discussion. Requirements expressed as SHALL statements with GIVEN/WHEN/THEN scenarios. Lives in `superspec/specs/<slug>/spec.md`.
 
 **Exit criterion:** The spec + context fits a fresh 200k-token window. If it doesn't, decompose into smaller specs.
@@ -51,24 +68,30 @@ Write an OpenSpec-style spec from the discussion. Requirements expressed as SHAL
 Parallel execution. Each executor gets a clean context. No shared state between tasks.
 
 ### 2.1 Pick Spec (`/pick-spec`)
+
 Choose the next spec to execute. Check dependencies, verify the spec is complete, confirm it fits a fresh context window.
 
 ### 2.2 Branch (`/branch`)
+
 Create a git branch or worktree for isolated execution. One branch per spec.
 
 ### 2.3 Subagent Development (`/subagent`)
+
 Dispatches a fresh subagent per task. Each subagent gets: the spec, the task, and nothing else. Two-stage review per task: spec compliance first, code quality second.
 
 Can also run in batch mode with human checkpoints between waves.
 
 ### 2.4 TDD (`/tdd`)
+
 Enforces RED → GREEN → REFACTOR strictly:
+
 1. Write failing test — watch it fail for the right reason
 2. Write minimal code — watch it pass
 3. Commit
 4. Code written before tests gets deleted
 
 ### 2.5 Code Review (`/code-review`)
+
 Runs between tasks. Reviews against the spec. Reports issues by severity. **Critical issues block progress** — no moving forward until resolved.
 
 ---
@@ -78,9 +101,11 @@ Runs between tasks. Reviews against the spec. Reports issues by severity. **Crit
 Walk through what was built. Diagnose and fix before declaring done.
 
 ### 3.1 Check Tests (`/check-tests`)
+
 Full test suite run. Coverage check. Every spec scenario verified by a test. No passing with skipped or pending tests.
 
 ### 3.2 Wiki Import (`/wiki`)
+
 Distill the implemented feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session.
 
 ---
@@ -88,6 +113,7 @@ Distill the implemented feature into the project wiki. Architecture decisions, p
 ## Phase 4 — Ship
 
 ### Ship (`/ship`)
+
 Create the PR. Write a changelog entry. Archive the phase directory. Mark spec complete. Trigger the next cycle: pick the next spec.
 
 ---
@@ -172,18 +198,18 @@ your-project/
 
 ## Skill Reference
 
-| Phase | Skill | Command | What it does |
-|---|---|---|---|
-| Plan | `plan-discuss` | `/discuss` | Capture decisions before planning |
-| Plan | `plan-spec` | `/spec` | Write OpenSpec-style spec |
-| Execute | `execute-pick-spec` | `/pick-spec` | Choose + validate next spec |
-| Execute | `execute-branch` | `/branch` | Create branch / worktree |
-| Execute | `execute-subagent` | `/subagent` | Parallel subagent task execution |
-| Execute | `execute-tdd` | `/tdd` | RED-GREEN-REFACTOR enforcement |
-| Execute | `execute-review` | `/code-review` | Between-task spec + quality review |
-| Verify | `verify-tests` | `/check-tests` | Full suite + scenario coverage |
-| Verify | `verify-wiki` | `/wiki` | Distill feature to wiki |
-| Ship | `ship` | `/ship` | PR + archive + next cycle |
+| Phase   | Skill               | Command        | What it does                       |
+| ------- | ------------------- | -------------- | ---------------------------------- |
+| Plan    | `plan-discuss`      | `/discuss`     | Capture decisions before planning  |
+| Plan    | `plan-spec`         | `/spec`        | Write OpenSpec-style spec          |
+| Execute | `execute-pick-spec` | `/pick-spec`   | Choose + validate next spec        |
+| Execute | `execute-branch`    | `/branch`      | Create branch / worktree           |
+| Execute | `execute-subagent`  | `/subagent`    | Parallel subagent task execution   |
+| Execute | `execute-tdd`       | `/tdd`         | RED-GREEN-REFACTOR enforcement     |
+| Execute | `execute-review`    | `/code-review` | Between-task spec + quality review |
+| Verify  | `verify-tests`      | `/check-tests` | Full suite + scenario coverage     |
+| Verify  | `verify-wiki`       | `/wiki`        | Distill feature to wiki            |
+| Ship    | `ship`              | `/ship`        | PR + archive + next cycle          |
 
 ---
 
