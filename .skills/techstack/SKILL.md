@@ -203,6 +203,90 @@ Use only packages that are current, well-maintained, and appropriate for the sta
 
 ---
 
+### Community Skills from awesome-skills.com
+
+Discover and recommend the best community-built skills matched to the detected stack. Use the curated baseline below as a reliable fallback, then enrich with a live fetch to surface any newer high-quality additions.
+
+#### Step 1 — Map stack to tags
+
+Use this table to identify which awesome-skills.com tags are relevant:
+
+| Stack element | Tags to match |
+|---|---|
+| Frontend (React / Next.js / Vue / Nuxt / Svelte / Angular) | `ui`, `design` |
+| Backend (Node / Python / Go / Rust / etc.) | `integration`, `data` |
+| DevOps / IaC (Docker / K8s / Terraform / Pulumi) | `devops` |
+| CI/CD (GitHub Actions / GitLab CI / etc.) | `devops`, `automation` |
+| Security / Auth | `security` |
+| Testing | `testing` |
+| All projects — always include | `workflow`, `review`, `skills` |
+
+#### Step 2 — Curated baseline (static fallback)
+
+These picks are pre-vetted. **Always include the two universal picks regardless of stack.** Use the domain picks for matching stack elements. If the live fetch (Step 3) fails, output these and note: *"Live fetch unavailable — showing curated picks."*
+
+**Universal — every project:**
+
+| Skill | Stars | Safety | What it does | Install |
+|---|---|---|---|---|
+| [Karpathy Guidelines](https://github.com/forrestchang/andrej-karpathy-skills) | 125k | Self-contained | Behavioral guidelines derived from Karpathy's LLM coding observations — Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven Execution | `/install forrestchang/andrej-karpathy-skills` |
+| [mattpocock/skills](https://github.com/mattpocock/skills) | 136k | Well-audited | `/grill-me`, `/grill-with-docs`, `/tdd`, `/handoff` — composable engineering discipline skills | `npx skills@latest add mattpocock/skills` |
+
+**By domain:**
+
+| Domain | Skill | Stars | Safety | Install |
+|---|---|---|---|---|
+| `ui` / `design` | [Stitch Skills](https://github.com/google-labs-code/stitch-skills) (Google Labs) | 5.3k | External deps | `npx skills add google-labs-code/stitch-skills --skill stitch-design --global` |
+| `ui` / `design` | [Interface Design](https://github.com/Dammyjay93/interface-design) | 4.8k | Self-contained | `/plugin marketplace add Dammyjay93/interface-design` |
+| `devops` / IaC | [HashiCorp Agent Skills](https://github.com/hashicorp/agent-skills) | 612 | Self-contained | `/plugin marketplace add hashicorp/agent-skills` |
+| `devops` / CI | [claude-code-action](https://github.com/anthropics/claude-code-action) (Anthropic) | 7.5k | Official | Add `anthropics/claude-code-action` to GitHub workflow YAML |
+| `security` | [Security Review](https://github.com/anthropics/claude-code-security-review) (Anthropic) | 4.6k | Official | Copy `security-review.md` to `.claude/commands/` |
+| `security` | [Destructive Command Guard](https://github.com/Dicklesworthstone/destructive_command_guard) | 1k | Self-contained, no network | `cargo install dcg` |
+| `testing` | [Claude Code Showcase](https://github.com/ChrisWiles/claude-code-showcase) | 5.9k | Self-contained | `git clone ChrisWiles/claude-code-showcase` |
+| `data` / fullstack | [Fullstack Dev Skills](https://github.com/Jeffallan/claude-skills) | 8.9k | Self-contained | `/plugin marketplace add jeffallan/claude-skills` |
+| Solana / Web3 | [Solana Dev Skill](https://github.com/solana-foundation/solana-dev-skill) (official) | 501 | Self-contained | `git clone https://github.com/solana-foundation/solana-dev-skill ~/.claude/skills/solana-dev` |
+
+#### Step 3 — Live fetch
+
+Fetch the community directory using the WebFetch tool:
+
+```
+URL: https://awesome-skills.com/
+```
+
+- If the fetch **succeeds**: scan all entries for those whose tags overlap with the relevant tags from Step 1. Proceed to Step 4.
+- If the fetch **fails**: use the curated baseline from Step 2 only. Note: *"Live fetch unavailable — showing curated picks."* Skip to Step 5.
+
+#### Step 4 — Filter and rank live results
+
+For each entry found in the live fetch:
+
+1. **Tag match** — does at least one tag match the relevant tags from Step 1? If not, skip.
+2. **Safety** — prefer entries marked `Self-contained` + `No code exec` + `No data sent`. Flag any that deviate (e.g. `Sends data`, `Arbitrary code`) with a brief note.
+3. **Stars** — rank higher-starred entries first within each domain.
+4. **Deduplicate** — if a live entry matches a curated baseline pick, do not list it twice. The curated entry takes precedence.
+
+#### Step 5 — Present recommendations
+
+Output the two universal picks first, then up to **5 picks per relevant domain**. Format each entry as:
+
+```
+**[Skill Name]** · ⭐ X,XXX · Self-contained
+What: <one sentence from the skill's description>
+Tags: <matching tags>
+Install: `<install command>`
+```
+
+Flag any skill with elevated risk (e.g. sends data externally, reads credentials) with:
+```
+⚠️ Note: <brief risk summary from the listing>
+```
+
+Close the section with:
+> Browse all community skills: **https://awesome-skills.com/**
+
+---
+
 ### Production-Readiness Checklist
 
 Generate a checklist tailored to the stated stack. Group by domain:
@@ -352,9 +436,22 @@ sources: [techstack-session]
 
 - [ ] <anything left unresolved>
 
+## Community Skills
+
+### Universal
+- **[Karpathy Guidelines](https://github.com/forrestchang/andrej-karpathy-skills)** — behavioral LLM coding guidelines (Think Before Coding, Simplicity First, Surgical Changes)
+  `/install forrestchang/andrej-karpathy-skills`
+- **[mattpocock/skills](https://github.com/mattpocock/skills)** — `/grill-me`, `/tdd`, `/handoff` and composable engineering discipline
+  `npx skills@latest add mattpocock/skills`
+
+### Stack-specific
+<list from Phase 2.2 — include name, one-line description, and install command for each pick>
+
+_Browse all community skills: https://awesome-skills.com/_
+
 ## Recommended Next Steps
 
-1. Install recommended skills (list them with install commands)
+1. Install the skills listed above (copy-paste install commands)
 2. Run `/discuss` to start planning the first feature
 3. Reference this profile in every spec for consistency
 ```
@@ -401,9 +498,11 @@ superspec/wiki/
     └── profile.md  (new)
 
 Recommended skills: <count>
+Community skills: <count> (<X> curated + <Y> discovered live)
 Production checklist items: <count>
 
 Suggested next steps:
+  Install community skills (commands in profile.md)
   /discuss — start planning your first feature
   /spec    — write a spec for something specific
 ```
@@ -419,3 +518,5 @@ Suggested next steps:
 - Do not write a generic checklist — every item must be relevant to the stated stack
 - Do not invent stack choices the user didn't state — ask if uncertain
 - Do not run Phase 3 without showing recommendations first and getting implicit or explicit confirmation
+- Do not skip the community skills step — always include the two universal baseline picks (Karpathy Guidelines + mattpocock/skills) regardless of stack
+- Do not recommend community skills with `Sends data` or `Arbitrary code` safety profile without explicitly flagging the risk

@@ -103,7 +103,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 
 > Run once per project. Revisit when the stack changes.
 
-Define the project's tech stack through a guided questionnaire. Get concrete recommendations for specialist skills to install, ecosystem libraries per domain, and a production-readiness checklist tailored to your stack. Saves a permanent profile to the wiki that every future session can reference.
+Define the project's tech stack through a guided questionnaire. Get concrete recommendations for specialist skills to install, ecosystem libraries per domain, and a production-readiness checklist tailored to your stack. Also fetches and filters the [awesome-skills.com](https://awesome-skills.com/) community directory live — surfacing the highest-starred, best-matched skills for your stack, with a curated fallback if unavailable. Saves a permanent profile to the wiki that every future session can reference.
 
 **Skills:** `/techstack`
 
