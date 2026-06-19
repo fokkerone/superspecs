@@ -1,0 +1,25 @@
+---
+description: SuperSpecs — spec-driven AI development framework
+globs: ["**/*"]
+alwaysApply: true
+---
+
+# SuperSpecs Active
+
+SuperSpecs is installed. Follow the SuperSpecs lifecycle for all feature work.
+
+## Lifecycle
+
+`/spec:plan` → `/spec:propose` → `/spec:implement` → `/spec:review` → `/spec:wiki` → `/spec:complete`
+
+## Rules
+
+1. Never implement without a reviewed spec in `superspec/specs/`
+2. Write failing tests before implementation code
+3. Verify tests pass before marking tasks done
+4. Sync to wiki after every shipped feature
+5. Query wiki before planning new features
+
+## Skills
+
+Skills live in `.skills/` and `.cursor/skills/`. Each `/spec:*` command triggers the corresponding skill file.

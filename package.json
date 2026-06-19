@@ -1,0 +1,28 @@
+{
+  "name": "superspecs",
+  "version": "0.1.0",
+  "description": "Spec-driven AI development: planning + TDD + living wiki memory",
+  "bin": {
+    "superspecs": "./bin/superspecs.js"
+  },
+  "scripts": {
+    "install-framework": "bash setup.sh"
+  },
+  "keywords": [
+    "ai",
+    "tdd",
+    "spec-driven",
+    "claude-code",
+    "cursor",
+    "opencode",
+    "copilot",
+    "agentic",
+    "wiki",
+    "development-workflow"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/superspecs.git"
+  }
+}

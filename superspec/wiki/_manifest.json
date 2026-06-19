@@ -1,0 +1,12 @@
+{
+  "sources": [
+    {
+      "change_id": "auth-jwt-initial",
+      "slug": "auth-jwt",
+      "ingested_at": "2026-06-19T00:00:00Z",
+      "pages_created": ["auth/jwt-pattern"],
+      "pages_updated": [],
+      "_note": "Example entry — shows manifest format"
+    }
+  ]
+}
