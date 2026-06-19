@@ -6,20 +6,25 @@ alwaysApply: true
 
 # SuperSpecs Active
 
-SuperSpecs is installed. Follow the SuperSpecs lifecycle for all feature work.
+Four phases, always in order: **Plan → Execute → Verify → Ship**
 
-## Lifecycle
+## Commands
 
-`/spec:plan` → `/spec:propose` → `/spec:implement` → `/spec:review` → `/spec:wiki` → `/spec:complete`
+| Phase | Command | What |
+|---|---|---|
+| 1.1 Plan | `/discuss` | Capture decisions before planning |
+| 1.2 Plan | `/spec` | Write spec (must fit 200k window) |
+| 2.1 Execute | `/pick-spec` | Validate + prepare execution |
+| 2.2 Execute | `/branch` | Create branch/worktree |
+| 2.3 Execute | `/subagent` | Parallel task dispatch |
+| 2.4 Execute | `/tdd` | RED-GREEN-REFACTOR |
+| 2.5 Execute | `/code-review` | Between tasks, critical blocks |
+| 3.1 Verify | `/check-tests` | Full suite + scenario coverage |
+| 3.2 Verify | `/wiki` | Distill to knowledge base |
+| 4 Ship | `/ship` | PR + archive + next cycle |
 
-## Rules
-
-1. Never implement without a reviewed spec in `superspec/specs/`
-2. Write failing tests before implementation code
-3. Verify tests pass before marking tasks done
-4. Sync to wiki after every shipped feature
-5. Query wiki before planning new features
-
-## Skills
-
-Skills live in `.skills/` and `.cursor/skills/`. Each `/spec:*` command triggers the corresponding skill file.
+## Hard Rules
+1. No implementation code before a failing test
+2. Critical code-review findings block all progress
+3. Spec must fit a fresh 200k context window
+4. Every shipped feature gets a wiki page

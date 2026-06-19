@@ -1,157 +1,126 @@
 # SuperSpecs 🚀
 
-**A unified AI development framework that combines spec-driven planning, TDD implementation, and living wiki memory — in one coherent workflow.**
+**A unified AI development framework: spec-driven planning → parallel TDD execution → verified shipping — with living wiki memory.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Agent: Claude Code](https://img.shields.io/badge/agent-Claude%20Code-blue)](https://claude.ai/code)
-[![Agent: Cursor](https://img.shields.io/badge/agent-Cursor-blue)](https://cursor.com)
-[![Agent: OpenCode](https://img.shields.io/badge/agent-OpenCode-blue)](https://opencode.ai)
-[![Agent: Copilot](https://img.shields.io/badge/agent-Copilot-blue)](https://github.com/features/copilot)
+[![Works with: Claude Code · Cursor · OpenCode · Copilot · Codex · Gemini CLI](https://img.shields.io/badge/agents-Claude%20Code%20·%20Cursor%20·%20OpenCode%20·%20Copilot-blue)]()
 
 ---
 
-## The Problem
+## The Four Phases
 
-Every AI coding framework solves one thing in isolation:
-
-| Tool          | What it solves               | What it ignores                   |
-| ------------- | ---------------------------- | --------------------------------- |
-| OpenSpec      | Spec-driven planning         | How to implement, how to remember |
-| Superpowers   | TDD discipline during coding | Planning before, memory after     |
-| obsidian-wiki | Living knowledge base        | The planning→coding lifecycle     |
-
-**SuperSpecs combines all three into a single lifecycle.**
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        SUPERSPEC LIFECYCLE                              │
+│                                                                         │
+│  1 ── PLAN                  2 ── EXECUTE                               │
+│  ─────────────────          ──────────────────────────────             │
+│  /discuss                   /pick-spec                                  │
+│    Capture decisions   →    /branch          → fresh worktree           │
+│  /spec                      /subagent         → parallel tasks          │
+│    Write spec          →    /tdd              → RED-GREEN-REFACTOR      │
+│    Fits 200k window         /code-review      → block on critical       │
+│                                                                         │
+│  3 ── VERIFY                4 ── SHIP                                  │
+│  ─────────────────          ──────────────────────────────             │
+│  /check-tests               /ship                                       │
+│    All green?          →      Create PR                                 │
+│  /wiki                        Archive phase                             │
+│    Distill knowledge          Repeat for next spec                      │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## The SuperSpecs Lifecycle
+## Phase 1 — Plan
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    SUPERSPEC LIFECYCLE                       │
-│                                                             │
-│  1. PLAN          2. PROPOSE        3. IMPLEMENT            │
-│  /spec:plan  ──▶  /spec:propose ──▶  /spec:implement        │
-│                                          │                  │
-│  Define feature    Review spec delta     TDD: red→green     │
-│  in plain words    before any code       YAGNI + DRY        │
-│                                          │                  │
-│  4. SYNC          5. QUERY          6. REVIEW               │
-│  /spec:wiki  ◀──  /spec:query  ◀──  /spec:review            │
-│                                          │                  │
-│  Write to wiki     Query past work       Subagent review    │
-│  as living docs    before planning       & sign-off         │
-└─────────────────────────────────────────────────────────────┘
-```
+Before any code exists, the plan must fit in a fresh 200k-token context window. This discipline ensures every executor starts clean.
 
-### Phase 1 — Plan (`/spec:plan`)
+### 1.1 Discuss (`/discuss`)
+Capture implementation decisions *before* anything is planned. Goals, constraints, open questions, non-goals. The output is a `DISCUSS.md` — the foundation for the spec.
 
-Inspired by **OpenSpec**: Before touching code, the agent clarifies what you're actually trying to build. It asks about goals, constraints, and edge cases — then generates a `spec.md` in `superspec/specs/<feature>/`.
+### 1.2 Spec (`/spec`)
+Write an OpenSpec-style spec from the discussion. Requirements expressed as SHALL statements with GIVEN/WHEN/THEN scenarios. Lives in `superspec/specs/<slug>/spec.md`.
 
-### Phase 2 — Propose (`/spec:propose`)
+**Exit criterion:** The spec + context fits a fresh 200k-token window. If it doesn't, decompose into smaller specs.
 
-Inspired by **OpenSpec**: Creates a reviewable proposal: `proposal.md`, `design.md`, `tasks.md`, and a spec delta. You review the plan. Nothing is coded yet.
+---
 
-### Phase 3 — Implement (`/spec:implement`)
+## Phase 2 — Execute
 
-Inspired by **Superpowers**: Kicks off subagent-driven TDD development. Tests first, always. Red → Green → Refactor. YAGNI. DRY. Each task gets verified before the next starts.
+Parallel execution. Each executor gets a clean context. No shared state between tasks.
 
-### Phase 4 — Review (`/spec:review`)
+### 2.1 Pick Spec (`/pick-spec`)
+Choose the next spec to execute. Check dependencies, verify the spec is complete, confirm it fits a fresh context window.
 
-Inspired by **Superpowers**: A second subagent reviews the implementation against the spec. Checks spec compliance, then code quality.
+### 2.2 Branch (`/branch`)
+Create a git branch or worktree for isolated execution. One branch per spec.
 
-### Phase 5 — Wiki Sync (`/spec:wiki`)
+### 2.3 Subagent Development (`/subagent`)
+Dispatches a fresh subagent per task. Each subagent gets: the spec, the task, and nothing else. Two-stage review per task: spec compliance first, code quality second.
 
-Inspired by **obsidian-wiki**: After implementation, distills the feature into your project wiki. Architecture decisions, patterns, trade-offs — the stuff you'd forget in 3 months.
+Can also run in batch mode with human checkpoints between waves.
 
-### Phase 6 — Query (`/spec:query`)
+### 2.4 TDD (`/tdd`)
+Enforces RED → GREEN → REFACTOR strictly:
+1. Write failing test — watch it fail for the right reason
+2. Write minimal code — watch it pass
+3. Commit
+4. Code written before tests gets deleted
 
-Inspired by **obsidian-wiki**: Before planning a new feature, query what you already know. Surfaces past decisions, similar implementations, and relevant patterns from your wiki.
+### 2.5 Code Review (`/code-review`)
+Runs between tasks. Reviews against the spec. Reports issues by severity. **Critical issues block progress** — no moving forward until resolved.
+
+---
+
+## Phase 3 — Verify
+
+Walk through what was built. Diagnose and fix before declaring done.
+
+### 3.1 Check Tests (`/check-tests`)
+Full test suite run. Coverage check. Every spec scenario verified by a test. No passing with skipped or pending tests.
+
+### 3.2 Wiki Import (`/wiki`)
+Distill the implemented feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session.
+
+---
+
+## Phase 4 — Ship
+
+### Ship (`/ship`)
+Create the PR. Write a changelog entry. Archive the phase directory. Mark spec complete. Trigger the next cycle: pick the next spec.
 
 ---
 
 ## Quick Start
 
-### Install (Claude Code)
-
 ```bash
-npx superspecs install
+# Install
+git clone https://github.com/your-org/superspecs.git
+cd your-project
+bash ~/.superspecs/setup.sh   # symlinks skills into all your agents
+
+# Or per-project
+git clone https://github.com/your-org/superspecs.git .superspecs
+bash .superspecs/setup.sh
 ```
 
-Or manually:
+Then open your agent and say: **"Tell me about your superspecs"**
 
-```bash
-git clone https://github.com/your-org/superspecs.git ~/.superspecs
-bash ~/.superspecs/setup.sh
-```
-
-Verify: open your agent and say **"Tell me about your superspecs"**.
-
-### Install (OpenCode)
-
-Add to your `opencode.json`:
-
-```json
-{
-  "plugin": ["superspecs@git+https://github.com/your-org/superspecs.git"]
-}
-```
-
-### Install (Cursor)
-
-Skills are auto-discovered from `.cursor/skills/`. Run `setup.sh` and restart Cursor.
-
-### Install (GitHub Copilot)
-
-```bash
-bash ~/.superspecs/setup.sh
-```
-
-Skills symlink to `~/.copilot/skills/` automatically.
-
----
-
-## Usage
-
-### Start a new feature
+### First feature
 
 ```
-/spec:plan Add user authentication with JWT tokens
+/discuss  What are we building and why?
+/spec     Write the spec
+/pick-spec  Confirm it fits a clean context
+/branch   Create worktree
+/subagent Start execution
+/tdd      Enforce RED-GREEN-REFACTOR
+/code-review  Check between tasks
+/check-tests  Verify everything passes
+/wiki     Distill to knowledge base
+/ship     PR + archive
 ```
-
-The agent clarifies goals, reads the wiki for past auth patterns, and generates `superspec/specs/auth-jwt/spec.md`.
-
-### Review and propose
-
-```
-/spec:propose auth-jwt
-```
-
-Generates proposal, design decisions, and implementation tasks. You review before any code is written.
-
-### Implement with TDD
-
-```
-/spec:implement auth-jwt
-```
-
-Subagent-driven TDD. Tests first. Verified task by task.
-
-### Sync to wiki after shipping
-
-```
-/spec:wiki auth-jwt
-```
-
-Distills the implementation into your project wiki. Links specs to wiki pages.
-
-### Query before building
-
-```
-/spec:query what do we know about rate limiting?
-```
-
-Searches both specs and wiki before starting a new feature.
 
 ---
 
@@ -160,87 +129,78 @@ Searches both specs and wiki before starting a new feature.
 ```
 your-project/
 ├── superspec/
-│   ├── specs/                    # Living feature specifications
-│   │   └── <feature>/
-│   │       ├── spec.md           # The spec (what it should do)
-│   │       └── status.md         # Current phase + checklist
+│   ├── specs/                      # Feature specifications
+│   │   └── <slug>/
+│   │       ├── DISCUSS.md          # Pre-planning decisions
+│   │       ├── spec.md             # The spec (SHALL + scenarios)
+│   │       ├── tasks.md            # Implementation tasks
+│   │       └── status.md           # Phase + checklist
 │   │
-│   ├── changes/                  # Proposals in review
-│   │   └── <change-id>/
-│   │       ├── proposal.md       # What we're building
-│   │       ├── design.md         # Technical decisions
-│   │       ├── tasks.md          # Implementation tasks
-│   │       └── specs/            # Spec deltas
+│   ├── phases/                     # Active phase working dirs
+│   │   └── <slug>-<phase>/
+│   │       ├── plan.md             # Decomposed execution plan
+│   │       ├── review-log.md       # Code review history
+│   │       └── wave-*.md           # Parallel execution waves
 │   │
-│   └── wiki/                     # Living knowledge base
-│       ├── _index.md             # Wiki entry point
-│       ├── _manifest.json        # Ingest tracking
-│       └── <topic>/              # Auto-organized by domain
-│           └── <page>.md
+│   └── wiki/                       # Living knowledge base
+│       ├── _index.md
+│       ├── _manifest.json
+│       └── <domain>/
+│           └── <topic>.md
 │
-├── .skills/                      # SuperSpecs skill definitions
-│   ├── spec-plan/SKILL.md
-│   ├── spec-propose/SKILL.md
-│   ├── spec-implement/SKILL.md
-│   ├── spec-review/SKILL.md
-│   ├── spec-wiki/SKILL.md
-│   ├── spec-query/SKILL.md
-│   ├── spec-status/SKILL.md
-│   └── spec-complete/SKILL.md
+├── .skills/                        # SuperSpecs skills (source of truth)
+│   ├── plan-discuss/SKILL.md
+│   ├── plan-spec/SKILL.md
+│   ├── execute-pick-spec/SKILL.md
+│   ├── execute-branch/SKILL.md
+│   ├── execute-subagent/SKILL.md
+│   ├── execute-tdd/SKILL.md
+│   ├── execute-review/SKILL.md
+│   ├── verify-tests/SKILL.md
+│   ├── verify-wiki/SKILL.md
+│   └── ship/SKILL.md
 │
-├── CLAUDE.md                     # Bootstrap → Claude Code
-├── AGENTS.md                     # Bootstrap → Codex, OpenCode, Aider
-├── .cursor/rules/superspecs.mdc  # Always-on → Cursor
-├── .windsurf/rules/superspecs.md # Always-on → Windsurf
-├── setup.sh                      # One-command install
-└── README.md                     # You are here
+├── CLAUDE.md                       # Bootstrap → Claude Code
+├── AGENTS.md                       # Bootstrap → Codex / OpenCode / Aider
+├── .cursor/rules/superspecs.mdc    # Always-on → Cursor
+├── .windsurf/rules/superspecs.md   # Always-on → Windsurf
+├── .github/copilot-instructions.md # Always-on → Copilot
+└── setup.sh
 ```
 
 ---
 
 ## Skill Reference
 
-| Skill            | Command                     | What it does                           |
-| ---------------- | --------------------------- | -------------------------------------- |
-| `spec-plan`      | `/spec:plan <feature>`      | Clarify goals, query wiki, create spec |
-| `spec-propose`   | `/spec:propose <feature>`   | Generate proposal + design + tasks     |
-| `spec-implement` | `/spec:implement <feature>` | TDD subagent implementation            |
-| `spec-review`    | `/spec:review <feature>`    | Dual-pass spec + code quality review   |
-| `spec-wiki`      | `/spec:wiki <feature>`      | Sync completed feature to wiki         |
-| `spec-query`     | `/spec:query <question>`    | Query specs + wiki together            |
-| `spec-status`    | `/spec:status`              | Dashboard: all features + their phases |
-| `spec-complete`  | `/spec:complete <feature>`  | Mark done, archive, update wiki        |
-| `skill-creator`  | `/skill-creator`            | Create new SuperSpecs skills           |
+| Phase | Skill | Command | What it does |
+|---|---|---|---|
+| Plan | `plan-discuss` | `/discuss` | Capture decisions before planning |
+| Plan | `plan-spec` | `/spec` | Write OpenSpec-style spec |
+| Execute | `execute-pick-spec` | `/pick-spec` | Choose + validate next spec |
+| Execute | `execute-branch` | `/branch` | Create branch / worktree |
+| Execute | `execute-subagent` | `/subagent` | Parallel subagent task execution |
+| Execute | `execute-tdd` | `/tdd` | RED-GREEN-REFACTOR enforcement |
+| Execute | `execute-review` | `/code-review` | Between-task spec + quality review |
+| Verify | `verify-tests` | `/check-tests` | Full suite + scenario coverage |
+| Verify | `verify-wiki` | `/wiki` | Distill feature to wiki |
+| Ship | `ship` | `/ship` | PR + archive + next cycle |
 
 ---
 
-## Philosophy
+## Design Principles
 
-SuperSpecs borrows three hard-won principles:
+**Plan fits a fresh context window.** No executor should need prior chat history to understand their task. If the plan is too big, it gets decomposed.
 
-**From OpenSpec:** _Specs live in your repo, not in your head._ A spec is not a prompt. It's a shared artifact you and your agent both commit to before a line of code is written.
+**Tests first, always.** Code written before tests gets deleted. No exceptions. RED before GREEN.
 
-**From Superpowers:** _Write tests first, always. Verify before declaring success._ An agent that skips tests is an agent making promises it can't keep.
+**Critical issues block progress.** A `/code-review` finding rated Critical is not a suggestion. Nothing moves forward until it's resolved.
 
-**From obsidian-wiki / Karpathy's LLM Wiki pattern:** _Compile knowledge once, reuse forever._ Don't ask the same questions twice. After every feature ships, the knowledge stays — in structured, queryable markdown your next session can read.
+**Knowledge outlives the session.** After every shipped feature, the wiki gains a page. Future planning sessions start informed.
 
----
-
-## Agent Compatibility
-
-| Agent              | Bootstrap                         | Skills Path          | Commands                            |
-| ------------------ | --------------------------------- | -------------------- | ----------------------------------- |
-| **Claude Code**    | `CLAUDE.md`                       | `.claude/skills/`    | `/spec:plan`, `/spec:propose`, etc. |
-| **Cursor**         | `.cursor/rules/superspecs.mdc`    | `.cursor/skills/`    | `/spec:plan`, etc.                  |
-| **Windsurf**       | `.windsurf/rules/superspecs.md`   | `.windsurf/skills/`  | via Cascade                         |
-| **OpenCode**       | `AGENTS.md`                       | `~/.agents/skills/`  | `/spec:plan`, etc.                  |
-| **Codex**          | `AGENTS.md`                       | `~/.codex/skills/`   | `$spec:plan`                        |
-| **Gemini CLI**     | `GEMINI.md`                       | `~/.gemini/skills/`  | `/spec:plan`, etc.                  |
-| **GitHub Copilot** | `.github/copilot-instructions.md` | `~/.copilot/skills/` | describe intent                     |
+**One branch per spec.** Isolation prevents interference between parallel workstreams.
 
 ---
 
 ## License
 
-MIT — build freely, ship confidently.
-Fokker chartier
+MIT

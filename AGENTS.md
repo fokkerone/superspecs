@@ -1,31 +1,35 @@
 # SuperSpecs — Agent Bootstrap
 
-SuperSpecs is installed in this project. It is a unified AI development framework combining spec-driven planning (OpenSpec pattern), TDD implementation (Superpowers methodology), and living wiki memory (Karpathy LLM Wiki pattern).
+SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 
-## Lifecycle
+## Lifecycle (always in order)
 
-Before writing any code:
+**Phase 1 — Plan**
+- `/discuss` — capture decisions before planning
+- `/spec` — write spec (fits 200k context window)
 
-1. `/spec:plan <feature>` — Clarify goals, query wiki, write spec
-2. `/spec:propose <feature>` — Reviewable proposal before any code
-3. `/spec:implement <feature>` — TDD subagent implementation  
-4. `/spec:review <feature>` — Dual-pass review
-5. `/spec:wiki <feature>` — Sync to wiki after shipping
-6. `/spec:query <question>` — Query specs + wiki
+**Phase 2 — Execute**
+- `/pick-spec` — validate spec, check context fit
+- `/branch` — create branch/worktree
+- `/subagent` — fresh subagent per task, two-stage review
+- `/tdd` — RED-GREEN-REFACTOR, no exceptions
+- `/code-review` — critical issues block progress
+
+**Phase 3 — Verify**
+- `/check-tests` — full suite, every scenario covered
+- `/wiki` — distill to knowledge base
+
+**Phase 4 — Ship**
+- `/ship` — PR, archive, next cycle
 
 ## Rules
-
-- Never implement without a reviewed spec
-- Write failing tests before implementation code
-- Run tests and verify they pass before proceeding
-- After every feature ships: sync to wiki
-- Before every feature starts: query the wiki
+- No implementation code before a failing test
+- Critical review findings block all progress
+- Spec must fit a fresh 200k context window
+- Every shipped feature → wiki page
 
 ## Paths
-
-- `superspec/specs/` — Specifications
-- `superspec/changes/` — Proposals
-- `superspec/wiki/` — Knowledge base
-- `.skills/` — Skill definitions
-
-Skills are in `.skills/` and in `~/.agents/skills/superspecs/`.
+- `superspec/specs/` — specs + DISCUSS.md files
+- `superspec/phases/` — execution working dirs
+- `superspec/wiki/` — knowledge base
+- `.skills/` — skill definitions

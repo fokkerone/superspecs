@@ -1,24 +1,31 @@
 # User Authentication (JWT) — Status
 
-## Phase
-complete ✅
+> **Example** — shows a complete lifecycle status file.
 
-> This is an **example feature** showing the full SuperSpecs lifecycle.
+## Phase
+4 — Shipped ✅
 
 ## Checklist
+- [x] Discussion complete (DISCUSS.md)
 - [x] Spec written
-- [x] Proposal generated
-- [x] Proposal reviewed
-- [x] Implementation started
-- [x] Tests passing
-- [x] Review passed
-- [x] Wiki synced
-- [x] Complete
+- [x] Spec fits context window (~18k / 200k)
+- [x] Branch created (superspec/auth-jwt)
+- [x] Subagent execution complete (3 waves, 7 tasks)
+- [x] All tests passing (42 tests)
+- [x] Code review passed (0 Critical, 2 Medium resolved)
+- [x] Wiki imported
+- [x] PR created
+- [x] Archived
 
-## Wiki References
-- [[superspec/wiki/auth/jwt-pattern]] — JWT token structure and refresh strategy
+## Slug
+auth-jwt
+
+## Wiki Pages
+- [[superspec/wiki/auth/jwt-pattern]] — Token strategy, refresh design
 - [[superspec/wiki/auth/session-decisions]] — Session duration trade-offs
 
-## Change History
-- 2026-06-19: Spec created (example)
-- 2026-06-19: Marked complete (example)
+## Started
+2026-06-19
+
+## Completed
+2026-06-19

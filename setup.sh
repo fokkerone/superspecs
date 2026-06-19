@@ -1,6 +1,5 @@
 #!/bin/bash
-# SuperSpecs Setup
-# Symlinks skills into all supported AI agent directories
+# SuperSpecs Setup — symlinks skills into all supported AI agent directories
 
 set -e
 
@@ -8,10 +7,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_DIR="$SCRIPT_DIR/.skills"
 
 echo ""
-echo "╔══════════════════════════════════════════╗"
-echo "║          SuperSpecs Setup                ║"
-echo "║  Spec-driven · TDD · Living Wiki         ║"
-echo "╚══════════════════════════════════════════╝"
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║  SuperSpecs Setup                                        ║"
+echo "║  Plan · Execute · Verify · Ship                         ║"
+echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 
 # ─── Helper ───────────────────────────────────────────────────────────────────
@@ -27,58 +26,56 @@ symlink_skills() {
       ln -sf "$skill_file" "$target_dir/$skill_name.md" 2>/dev/null || true
     fi
   done
-  echo "  ✓ $label → $target_dir"
+  echo "  ✓ $label"
 }
 
-# ─── Project-level symlinks ───────────────────────────────────────────────────
+# ─── Project-level ────────────────────────────────────────────────────────────
 
-echo "→ Setting up project-level skills..."
+echo "→ Project-level agent skills..."
+symlink_skills "$SCRIPT_DIR/.claude/skills"     "Claude Code (project)"
+symlink_skills "$SCRIPT_DIR/.cursor/skills"     "Cursor (project)"
+symlink_skills "$SCRIPT_DIR/.windsurf/skills"   "Windsurf (project)"
+symlink_skills "$SCRIPT_DIR/.agents/skills"     "OpenCode / Aider / generic (project)"
 
-symlink_skills "$SCRIPT_DIR/.claude/skills" "Claude Code"
-symlink_skills "$SCRIPT_DIR/.cursor/skills" "Cursor"
-symlink_skills "$SCRIPT_DIR/.windsurf/skills" "Windsurf"
-symlink_skills "$SCRIPT_DIR/.agents/skills" "OpenCode / Aider / generic"
-
-# ─── Global symlinks ──────────────────────────────────────────────────────────
-
-echo ""
-echo "→ Setting up global skills..."
-
-symlink_skills "$HOME/.claude/skills" "Claude Code (global)"
-symlink_skills "$HOME/.codex/skills" "Codex"
-symlink_skills "$HOME/.gemini/skills" "Gemini CLI"
-symlink_skills "$HOME/.copilot/skills" "GitHub Copilot CLI"
-symlink_skills "$HOME/.agents/skills" "OpenCode (global)"
-
-# Optional agents (only if their config dirs exist)
-[ -d "$HOME/.windsurf" ] && symlink_skills "$HOME/.windsurf/skills" "Windsurf (global)"
-[ -d "$HOME/.cursor" ] && symlink_skills "$HOME/.cursor/skills" "Cursor (global)"
-[ -d "$HOME/.kiro" ] && symlink_skills "$HOME/.kiro/skills" "Kiro"
-[ -d "$HOME/.pi" ] && symlink_skills "$HOME/.pi/agent/skills" "Pi"
-
-# ─── Initialize wiki structure ────────────────────────────────────────────────
+# ─── Global ──────────────────────────────────────────────────────────────────
 
 echo ""
-echo "→ Initializing SuperSpecs directories..."
+echo "→ Global agent skills..."
+symlink_skills "$HOME/.claude/skills"           "Claude Code (global)"
+symlink_skills "$HOME/.codex/skills"            "Codex (global)"
+symlink_skills "$HOME/.gemini/skills"           "Gemini CLI (global)"
+symlink_skills "$HOME/.copilot/skills"          "GitHub Copilot CLI (global)"
+symlink_skills "$HOME/.agents/skills"           "OpenCode (global)"
+
+[ -d "$HOME/.windsurf" ] && symlink_skills "$HOME/.windsurf/skills"  "Windsurf (global)"
+[ -d "$HOME/.cursor"   ] && symlink_skills "$HOME/.cursor/skills"    "Cursor (global)"
+[ -d "$HOME/.kiro"     ] && symlink_skills "$HOME/.kiro/skills"      "Kiro (global)"
+[ -d "$HOME/.pi"       ] && symlink_skills "$HOME/.pi/agent/skills"  "Pi (global)"
+
+# ─── Initialize SuperSpecs directories ───────────────────────────────────────
+
+echo ""
+echo "→ Initializing project structure..."
 
 mkdir -p "$SCRIPT_DIR/superspec/specs"
-mkdir -p "$SCRIPT_DIR/superspec/changes/archive"
+mkdir -p "$SCRIPT_DIR/superspec/phases"
+mkdir -p "$SCRIPT_DIR/superspec/archive"
 mkdir -p "$SCRIPT_DIR/superspec/wiki"
 
 if [ ! -f "$SCRIPT_DIR/superspec/wiki/_index.md" ]; then
-  cat > "$SCRIPT_DIR/superspec/wiki/_index.md" << 'EOF'
+cat > "$SCRIPT_DIR/superspec/wiki/_index.md" << 'WIKIEOF'
 # Project Wiki
 
-This wiki is maintained by SuperSpecs. It contains distilled knowledge from implemented features.
+Maintained by SuperSpecs. Distilled knowledge from shipped features.
 
 ## Domains
 
-(Added automatically as features are synced)
+(Added automatically via /wiki after each shipped feature)
 
 ## Recent Updates
 
-(Updated by /spec:wiki)
-EOF
+(Updated by /wiki)
+WIKIEOF
 fi
 
 if [ ! -f "$SCRIPT_DIR/superspec/wiki/_manifest.json" ]; then
@@ -88,12 +85,19 @@ fi
 # ─── Done ─────────────────────────────────────────────────────────────────────
 
 echo ""
-echo "╔══════════════════════════════════════════╗"
-echo "║  SuperSpecs is ready!                    ║"
-echo "╚══════════════════════════════════════════╝"
+echo "╔══════════════════════════════════════════════════════════╗"
+echo "║  SuperSpecs ready!                                       ║"
+echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
-echo "Open your agent and say: \"Tell me about your superspecs\""
+echo "  Open your agent and say: \"Tell me about your superspecs\""
 echo ""
-echo "Start your first feature:"
-echo "  /spec:plan <feature name>"
+echo "  Start your first feature:"
+echo "    /discuss   ← capture decisions"
+echo "    /spec      ← write the spec"
+echo "    /pick-spec ← validate + prepare"
+echo "    /branch    ← create worktree"
+echo "    /subagent  ← execute with TDD"
+echo "    /check-tests"
+echo "    /wiki"
+echo "    /ship"
 echo ""

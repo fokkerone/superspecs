@@ -1,43 +1,44 @@
-# SuperSpecs — Claude Code Bootstrap
+# SuperSpecs — Claude Code
 
-You have SuperSpecs installed. SuperSpecs is a unified AI development framework that combines spec-driven planning, TDD implementation, and living wiki memory.
+You have SuperSpecs installed. Four phases, always in order.
 
-## Your Workflow
+## The Lifecycle
 
-Before writing any code, follow the SuperSpecs lifecycle:
+```
+PLAN → EXECUTE → VERIFY → SHIP
+```
 
-1. **Plan first** — Use `/spec:plan` to clarify goals and create a spec
-2. **Propose** — Use `/spec:propose` to generate a reviewable proposal
-3. **Implement with TDD** — Use `/spec:implement` for test-first subagent development
-4. **Review** — Use `/spec:review` for dual-pass quality check
-5. **Sync to wiki** — Use `/spec:wiki` to persist knowledge after shipping
-6. **Query before building** — Use `/spec:query` to avoid reinventing the wheel
+### Phase 1: Plan
+1. `/discuss` — Capture decisions, goals, non-goals, constraints BEFORE any spec is written
+2. `/spec` — Write the spec (SHALL requirements + GIVEN/WHEN/THEN scenarios)
 
-## Core Principles
+**Exit gate:** Spec + context fits a fresh 200k context window. Too big = decompose.
 
-- **Spec before code.** Never start implementing without a reviewed spec.
-- **Tests first, always.** Write the failing test before writing the implementation.
-- **Verify before declaring success.** Run the tests. See them pass.
-- **Distill after shipping.** Every completed feature gets synced to the wiki.
-- **Query before planning.** Always check the wiki before starting a new feature.
+### Phase 2: Execute
+3. `/pick-spec` — Confirm spec is complete and context-window-fit
+4. `/branch` — Create git branch or worktree (one per spec)
+5. `/subagent` — Dispatch fresh subagent per task; two-stage review per task
+6. `/tdd` — RED → GREEN → REFACTOR. Write failing test. Watch it fail. Write minimal code. Watch it pass. Commit. Delete any code written before tests.
+7. `/code-review` — Runs between tasks. Critical issues BLOCK progress.
 
-## Skills Available
+### Phase 3: Verify
+8. `/check-tests` — Full suite. Every spec scenario must have a passing test.
+9. `/wiki` — Distill to knowledge base.
 
-Skills live in `.skills/` and `.claude/skills/`. You have:
+### Phase 4: Ship
+10. `/ship` — PR + changelog + archive + start next cycle.
 
-- `/spec:plan` — Start a feature: clarify, query wiki, write spec
-- `/spec:propose` — Generate proposal + design + tasks for review
-- `/spec:implement` — TDD subagent implementation
-- `/spec:review` — Spec compliance + code quality review
-- `/spec:wiki` — Sync completed feature to wiki
-- `/spec:query` — Search specs + wiki
-- `/spec:status` — Dashboard of all features and their phases
-- `/spec:complete` — Mark feature done and archive
+## Hard Rules
 
-## Where Things Live
+- Never write implementation code before a failing test exists
+- Never proceed past a Critical code review finding
+- Never skip `/discuss` — decisions captured late are decisions lost
+- Never declare done without `/check-tests` passing
+- Every shipped feature gets a wiki page
 
-- `superspec/specs/` — Feature specifications
-- `superspec/changes/` — Proposals under review
+## Paths
+
+- `superspec/specs/` — Specs and discussion docs
+- `superspec/phases/` — Active execution working dirs
 - `superspec/wiki/` — Living knowledge base
-
-Read the relevant skill file before executing any SuperSpecs command.
+- `.skills/` — Skill definitions
