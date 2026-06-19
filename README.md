@@ -1,14 +1,14 @@
 ```
-   ________  ________  ________  ________  ________
-  ╱        ╲╱    ╱   ╲╱        ╲╱        ╲╱        ╲
- ╱        _╱         ╱         ╱         ╱         ╱
-╱-        ╱         ╱       __╱        _╱        _╱
-╲_______╱╱╲________╱╲______╱  ╲________╱╲____╱___╱
-         ________  ________  ________  ________  ________
-        ╱        ╲╱        ╲╱        ╲╱        ╲╱        ╲
-       ╱        _╱         ╱         ╱         ╱        _╱
-      ╱-        ╱       __╱        _╱       --╱-        ╱
-      ╲_______╱╱╲______╱  ╲________╱╲________╱╲________╱
+            ________  ________  ________  ________  ________
+           ╱        ╲╱    ╱   ╲╱        ╲╱        ╲╱        ╲
+          ╱        _╱         ╱         ╱         ╱         ╱
+         ╱-        ╱         ╱       __╱        _╱        _╱
+         ╲_______╱╱╲________╱╲______╱  ╲________╱╲____╱___╱
+                             ________  ________  ________  ________  ________
+                            ╱        ╲╱        ╲╱        ╲╱        ╲╱        ╲
+                           ╱        _╱         ╱         ╱         ╱        _╱
+                          ╱-        ╱       __╱        _╱       --╱-        ╱
+                          ╲_______╱╱╲______╱  ╲________╱╲________╱╲________╱
 ```
 
 # SuperSpecs
@@ -32,7 +32,7 @@ Three pillars — each solving a distinct failure mode:
 
 **TDD** — RED before GREEN, without exception. Tests are written first. Code written without a failing test gets deleted. The test suite is the ground truth, not the agent's confidence.
 
-**Wiki** — Andrej Karpathy's insight, applied at the project level: the context window is ephemeral, but the wiki is permanent. After every shipped feature, knowledge is distilled into structured pages — architecture decisions, patterns, trade-offs, gotchas, open questions. The next session opens the wiki and starts *informed*, not blind. Knowledge compounds. Problems stay solved. The codebase has memory.
+**Wiki** — Andrej Karpathy's insight, applied at the project level: the context window is ephemeral, but the wiki is permanent. After every shipped feature, knowledge is distilled into structured pages — architecture decisions, patterns, trade-offs, gotchas, open questions. The next session opens the wiki and starts _informed_, not blind. Knowledge compounds. Problems stay solved. The codebase has memory.
 
 The result: five AI agents running in parallel, each with a fresh context, each working from the same spec, each contributing to the same wiki. Nothing lost between sessions. Nothing re-discovered twice. Every shipped feature leaves the system more legible than it found it.
 
@@ -41,6 +41,10 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 ## The Four Phases
 
 ```
+ _  _  __  _   _   _ _____   _   _  __  ___ _  __ __
+| || |/__\| | | | | |_   _| | | | |/__\| _ \ |/ /' _/
+| >< | \/ | 'V' | | | | |   | 'V' | \/ | v /   <`._`.
+|_||_|\__/!_/ \_! |_| |_|   !_/ \_!\__/|_|_\_|\_\___/
 ┌─────────────────────────────────────────────────────┐
 │  PHASE 0  ·  SETUP                                  │
 ├─────────────────────────────────────────────────────┤
@@ -264,19 +268,19 @@ your-project/
 
 ## Skill Reference
 
-| Phase   | Skill               | Command        | What it does                       |
-| ------- | ------------------- | -------------- | ---------------------------------- |
+| Phase   | Skill               | Command        | What it does                                                                 |
+| ------- | ------------------- | -------------- | ---------------------------------------------------------------------------- |
 | Setup   | `techstack`         | `/techstack`   | Questionnaire: define stack, recommend skills & libraries, save wiki profile |
-| Plan    | `plan-discuss`      | `/discuss`     | Capture decisions before planning  |
-| Plan    | `plan-spec`         | `/spec`        | Write OpenSpec-style spec          |
-| Execute | `execute-pick-spec` | `/pick-spec`   | Choose + validate next spec        |
-| Execute | `execute-branch`    | `/branch`      | Create branch / worktree           |
-| Execute | `execute-subagent`  | `/subagent`    | Parallel subagent task execution   |
-| Execute | `execute-tdd`       | `/tdd`         | RED-GREEN-REFACTOR enforcement     |
-| Execute | `execute-review`    | `/code-review` | Between-task spec + quality review |
-| Verify  | `verify-tests`      | `/check-tests` | Full suite + scenario coverage     |
-| Verify  | `verify-wiki`       | `/wiki`        | Distill feature to wiki            |
-| Ship    | `ship`              | `/ship`        | PR + archive + next cycle          |
+| Plan    | `plan-discuss`      | `/discuss`     | Capture decisions before planning                                            |
+| Plan    | `plan-spec`         | `/spec`        | Write OpenSpec-style spec                                                    |
+| Execute | `execute-pick-spec` | `/pick-spec`   | Choose + validate next spec                                                  |
+| Execute | `execute-branch`    | `/branch`      | Create branch / worktree                                                     |
+| Execute | `execute-subagent`  | `/subagent`    | Parallel subagent task execution                                             |
+| Execute | `execute-tdd`       | `/tdd`         | RED-GREEN-REFACTOR enforcement                                               |
+| Execute | `execute-review`    | `/code-review` | Between-task spec + quality review                                           |
+| Verify  | `verify-tests`      | `/check-tests` | Full suite + scenario coverage                                               |
+| Verify  | `verify-wiki`       | `/wiki`        | Distill feature to wiki                                                      |
+| Ship    | `ship`              | `/ship`        | PR + archive + next cycle                                                    |
 
 ---
 
