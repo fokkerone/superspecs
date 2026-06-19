@@ -431,6 +431,52 @@ if [ ! -f "$PROJECT_DIR/superspec/wiki/_manifest.json" ]; then
   echo '{"sources":[]}' > "$PROJECT_DIR/superspec/wiki/_manifest.json"
 fi
 
+# ── Wiki meta directory (taxonomy, insights) ───────────────────────────────
+
+mkdir -p "$PROJECT_DIR/superspec/wiki/_meta"
+mkdir -p "$PROJECT_DIR/superspec/wiki/_archives"
+
+if [ ! -f "$PROJECT_DIR/superspec/wiki/_meta/taxonomy.md" ]; then
+cat > "$PROJECT_DIR/superspec/wiki/_meta/taxonomy.md" << 'TAXEOF'
+---
+title: Tag Taxonomy
+updated: ""
+---
+
+# Tag Taxonomy
+
+Canonical tag vocabulary for this vault. All wiki pages must use tags from this list.
+Run `/superspecs:tag-taxonomy` to audit and normalize tags across the vault.
+
+## Domain Tags
+
+- `auth` — authentication and authorization
+- `api` — API design and contracts
+- `data` — data models and storage
+- `ui` — frontend and interface
+- `infra` — infrastructure and deployment
+- `patterns` — reusable implementation patterns
+- `decisions` — architecture decision records
+
+## Topic Tags
+
+_(add project-specific topic tags here)_
+
+## Meta Tags
+
+- `index` — index and home pages (reserved)
+- `log` — activity log (reserved)
+- `insights` — generated insights pages (reserved)
+- `lint` — lint report pages (reserved)
+- `query-derived` — pages created from /wiki-query results
+- `capture` — pages created from /wiki-capture
+
+## Aliases
+
+_(non-canonical → canonical mappings, managed by /tag-taxonomy)_
+TAXEOF
+fi
+
 # ─── Done ─────────────────────────────────────────────────────────────────────
 
 echo ""

@@ -28,6 +28,21 @@ The wiki lives at `superspec/wiki/` and doubles as an **Obsidian vault**. Write 
 - Task checklists or execution logs
 - The full spec (it lives in `superspec/specs/`)
 
+## Provenance
+
+Mark the origin of every claim so future readers know what is fact vs. synthesis:
+
+- Default (no marker): directly extracted from source material
+- `^[inferred]` — synthesized by the agent; not stated verbatim in sources
+- `^[ambiguous]` — sources disagree or the claim is uncertain
+
+Example:
+```
+The team chose Redis over Postgres for session storage because of latency requirements.
+A TTL of 15 minutes was selected as the balance point. ^[inferred]
+Note: the DISCUSS.md mentions 10 minutes but the spec says 15 — see review-log. ^[ambiguous]
+```
+
 ---
 
 ## Steps
@@ -60,8 +75,6 @@ For each existing page that overlaps with this feature:
 - Mark it with `updated: <today>` in the YAML frontmatter.
 - Note it in the "pages_updated" list for the manifest and log.
 
-For topics with no existing page: create a new page (Step 4).
-
 **Rule:** One knowledge unit = one page. Merge, don't proliferate.
 
 ---
@@ -85,10 +98,16 @@ For each new knowledge unit, create `superspec/wiki/<domain>/<topic>.md`:
 ```markdown
 ---
 title: <Page Title>
+summary: <1–2 sentence summary used for fast query previews — what this is and why it matters>
 tags: [<domain>, <feature-slug>, <topic-tags>]
 spec: "[[<slug>]]"
 created: <YYYY-MM-DD>
 updated: <YYYY-MM-DD>
+provenance:
+  sources: [specs/<slug>/spec.md, phases/<slug>-execute/review-log.md]
+  extracted: ~70%
+  inferred: ~25%
+  ambiguous: ~5%
 ---
 
 # <Page Title>
@@ -134,10 +153,16 @@ When and why this was built. What problem it solves.
 - `<path/to/key/file>` — <what it does>
 ```
 
+**Provenance markers in body text:**
+- No marker = extracted directly from source material
+- `^[inferred]` = agent synthesis, not stated verbatim
+- `^[ambiguous]` = sources disagree or claim is uncertain
+
 **Obsidian linking rules:**
 - Internal links: always use `[[page-title]]` or `[[folder/page]]`, never markdown `[text](path.md)`
 - File references: use backtick code spans for source file paths (`src/auth/jwt.ts`)
 - Tags: lowercase, hyphenated (`auth`, `jwt-tokens`, `session-management`)
+- Tags must come from `_meta/taxonomy.md` if it exists; add new tags there if needed
 
 ---
 
@@ -154,16 +179,13 @@ updated: <YYYY-MM-DD>
 
 # Project Wiki
 
-Knowledge base distilled from shipped features — architecture decisions, patterns, trade-offs, gotchas.
-
-> Open `superspec/wiki/` in Obsidian for graph view, backlinks, and tag search.
+...
 
 ## Domains
 
 | Domain | Pages | Last updated |
 |--------|-------|-------------|
 | [[auth/Home\|auth]] | N | YYYY-MM-DD |
-| [[<domain>/Home\|<domain>]] | N | YYYY-MM-DD |
 
 ## Recent Updates
 
@@ -172,20 +194,7 @@ _(last 10 — full history in [[log]])_
 - <YYYY-MM-DD>: [[<domain>/<page>]] — <brief description>
 ```
 
-Each domain folder should have its own `Home.md` listing its pages:
-
-```markdown
----
-title: <Domain> — Index
-tags: [index, <domain>]
-updated: <YYYY-MM-DD>
----
-
-# <Domain>
-
-- [[<page1>]] — <what it covers>
-- [[<page2>]] — <what it covers>
-```
+Each domain folder should also have its own `Home.md` listing its pages.
 
 ---
 
@@ -195,6 +204,8 @@ After writing all pages:
 - Scan existing wiki pages for unlinked mentions of new page topics
 - Add `[[wikilinks]]` where relevant
 - Ensure the new pages link back to related existing pages
+
+Or invoke `/superspecs:cross-linker` to automate this step.
 
 ---
 
@@ -210,12 +221,6 @@ Append to `superspec/wiki/log.md` (create if missing):
 - **Domains touched:** <domain1>, <domain2>
 - **Spec:** [[../specs/<slug>/spec.md]]
 ```
-
-**log.md format rules:**
-- Append-only — never edit existing entries
-- One `##` heading per ingest event, timestamped
-- Keep entries short: what changed and where
-- The log is grep-friendly: `grep "## \[" log.md` lists all events
 
 ---
 
@@ -268,6 +273,7 @@ superspec/wiki/
 ├── Home.md          (updated)
 └── log.md           (appended)
 
+Run /cross-linker to auto-weave [[wikilinks]] across the vault.
 Open superspec/wiki/ in Obsidian to browse the vault.
 
 Next: /superspecs:ship <slug>

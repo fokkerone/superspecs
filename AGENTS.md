@@ -32,8 +32,13 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 - `/superspecs:ship` — PR, archive, next cycle
 
 ## Wiki Operations (run any time)
-- `/superspecs:wiki-query` — query the compiled wiki; answer stays in context or files back as a page
+- `/superspecs:wiki-query` — tiered retrieval query; answer stays in context or files back as a page
 - `/superspecs:wiki-lint` — health check: orphans, broken links, contradictions, stale refs
+- `/superspecs:cross-linker` — auto-insert `[[wikilinks]]` for unlinked mentions
+- `/superspecs:wiki-status` — vault dashboard: size, hubs, tags, provenance, pending sources
+- `/superspecs:wiki-capture` — save session findings to wiki (`--quick` or `--full`)
+- `/superspecs:tag-taxonomy` — canonical tag vocabulary; audit and normalize vault-wide
+- `/superspecs:wiki-rebuild` — archive + rebuild vault; restore from snapshot
 
 ## Wiki Architecture (Karpathy LLM Wiki pattern)
 ```
