@@ -13,7 +13,7 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 - `/superspecs:techstack` — questionnaire: define stack, get skill & library recommendations, save to wiki
 
 **Phase 1 — Plan**
-- `/superspecs:design-import <path>` — import DesignOS export → DISCUSS.md + spec.md + tasks.md (replaces /discuss + /spec)
+- `/superspecs:design-import <path>` — (optional) import DesignOS export → design-context.md; enriches /discuss + /spec with design constraints, data shapes, milestone structure, and test scaffolding
 - `/superspecs:discuss` — capture decisions before planning
 - `/superspecs:spec` — write spec (fits 200k context window)
 - `/superspecs:grill` — stress-test spec against wiki + techstack before execution

@@ -25,13 +25,23 @@ The complete spec — plus the implementation context — must fit in a fresh 20
 
 ## Steps
 
-### 1. Read DISCUSS.md completely
+### 1. Read DISCUSS.md and design-context.md
 
 Read `superspec/specs/<slug>/DISCUSS.md`. Do not proceed without understanding it fully.
 
+Then check for `superspec/specs/<slug>/design-context.md`. If it exists, read it completely before writing the spec. It carries design constraints from a DesignOS export — treat them as fixed inputs, not decisions to re-make:
+
+- **Design system constraints** → add to Non-Functional Requirements + Out of Scope
+- **Data contract types** → add an Interface/Contract section or enrich Requirements
+- **Milestone structure** → use as the wave structure in `tasks.md`
+- **Test scaffolding** → use as starting points for GIVEN/WHEN/THEN scenarios (adapt, don't copy verbatim)
+- **Open questions** → check if they were answered in `DISCUSS.md`; if not, surface them in the spec's Out of Scope or flag them
+
+DISCUSS.md carries the human decisions. design-context.md carries the design constraints. The spec merges both.
+
 ### 2. Check for existing specs in this domain
 
-Read `superspec/wiki/_index.md` and any related specs in `superspec/specs/`. Note:
+Read `superspec/wiki/Home.md` and any related specs in `superspec/specs/`. Note:
 - Patterns already established (naming, structure, error formats)
 - Decisions already made that this spec should be consistent with
 
