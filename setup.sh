@@ -59,10 +59,6 @@ DIRS=(
 # Selection state (1=selected, 0=deselected) — all selected by default
 SEL=( 1 1 1 1 1 1 1 1 1 1 1 1 )
 
-# Menu cursor: 0=All, 1-4=project items, 5-12=global items
-MENU_CURSOR=0
-MENU_LINES=15  # All(1) + sep(1) + project(4) + sep(1) + global(8) = 15
-
 # ─── Symlink helper ───────────────────────────────────────────────────────────
 
 symlink_skills() {
@@ -78,102 +74,105 @@ symlink_skills() {
   echo "  ✓ $label"
 }
 
-# ─── Multiselect UI ───────────────────────────────────────────────────────────
+# ─── Selection helpers ────────────────────────────────────────────────────────
 
-_all_sel() {
-  for v in "${SEL[@]}"; do [ "$v" -eq 0 ] && return 1; done
-  return 0
+_apply_selection() {
+  # Reads newline-separated selected labels from $1, updates SEL array
+  local result="$1"
+  SEL=( 0 0 0 0 0 0 0 0 0 0 0 0 )
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    for ((i=0; i<12; i++)); do
+      [ "${LABELS[$i]}" = "$line" ] && SEL[$i]=1
+    done
+  done <<< "$result"
 }
 
-_draw_menu() {
-  local i check
+_select_with_fzf() {
+  local result
+  result=$(printf '%s\n' "${LABELS[@]}" | \
+    fzf --multi \
+        --bind 'start:select-all' \
+        --bind 'ctrl-a:select-all' \
+        --bind 'ctrl-d:deselect-all' \
+        --height='~100%' \
+        --layout=reverse \
+        --border=rounded \
+        --prompt='  Install › ' \
+        --header=$'TAB/SPACE toggle · CTRL-A select all · CTRL-D deselect all · ENTER confirm\n\n  Project: Claude Code · Cursor · Windsurf · OpenCode\n  Global:  Claude Code · Codex · Gemini · Copilot · OpenCode · Cursor · Kiro · Pi'
+  ) || return 1
+  _apply_selection "$result"
+}
 
-  # Row: All
-  _all_sel 2>/dev/null && check="✓" || check=" "
-  if [ "$MENU_CURSOR" -eq 0 ]; then
-    printf "\e[1;36m ▶ [%s] All agents\e[0m\n" "$check"
-  else
-    printf "   [%s] All agents\n" "$check"
-  fi
+_select_with_gum() {
+  local selected_str result
+  # Build comma-separated pre-selection string from all labels
+  selected_str=$(printf '%s,' "${LABELS[@]}")
+  selected_str="${selected_str%,}"  # remove trailing comma
 
-  # Section: Project
-  printf "   \e[2m── Project ─────────────────────────────────\e[0m\n"
+  result=$(gum choose --no-limit \
+    --height=16 \
+    --header="Select agents to install (SPACE toggle, ENTER confirm):" \
+    --selected="$selected_str" \
+    "${LABELS[@]}") || return 1
+  _apply_selection "$result"
+}
+
+_select_fallback() {
+  # Simple numbered list — press ENTER to install all, or enter numbers to skip
+  echo "  Agents available:"
+  echo ""
+  echo "  ── Project ──────────────────────────────────"
   for ((i=0; i<4; i++)); do
-    [ "${SEL[$i]}" -eq 1 ] && check="✓" || check=" "
-    if [ "$MENU_CURSOR" -eq $((i+1)) ]; then
-      printf "\e[1;36m ▶ [%s] %s\e[0m\n" "$check" "${LABELS[$i]}"
-    else
-      printf "   [%s] %s\n" "$check" "${LABELS[$i]}"
-    fi
+    printf "  %2d) %s\n" $((i+1)) "${LABELS[$i]}"
   done
-
-  # Section: Global
-  printf "   \e[2m── Global ──────────────────────────────────\e[0m\n"
+  echo ""
+  echo "  ── Global ───────────────────────────────────"
   for ((i=4; i<12; i++)); do
-    [ "${SEL[$i]}" -eq 1 ] && check="✓" || check=" "
-    if [ "$MENU_CURSOR" -eq $((i+1)) ]; then
-      printf "\e[1;36m ▶ [%s] %s\e[0m\n" "$check" "${LABELS[$i]}"
-    else
-      printf "   [%s] %s\n" "$check" "${LABELS[$i]}"
-    fi
+    printf "  %2d) %s\n" $((i+1)) "${LABELS[$i]}"
   done
-
-  tput cuu "$MENU_LINES" 2>/dev/null || true
+  echo ""
+  printf "  Enter numbers to SKIP (e.g. 5 6 7), or press ENTER to install all: "
+  local skip_input
+  read -r skip_input
+  if [ -n "$skip_input" ]; then
+    for n in $skip_input; do
+      local idx=$((n-1))
+      [ "$idx" -ge 0 ] && [ "$idx" -lt 12 ] && SEL[$idx]=0
+    done
+  fi
 }
+
+# ─── Tool detection + multiselect ─────────────────────────────────────────────
 
 run_multiselect() {
-  # Skip when non-interactive (piped, CI, etc.)
-  [ -t 0 ] && [ -t 1 ] || return 0
+  [ -t 0 ] && [ -t 1 ] || return 0  # Skip when non-interactive (CI, piped)
 
-  local old_stty
-  old_stty=$(stty -g 2>/dev/null) || return 0
+  if command -v fzf >/dev/null 2>&1; then
+    _select_with_fzf && return 0
+  fi
 
-  tput civis 2>/dev/null || true
-  stty raw -echo 2>/dev/null || { stty "$old_stty" 2>/dev/null || true; return 0; }
+  if command -v gum >/dev/null 2>&1; then
+    _select_with_gum && return 0
+  fi
 
-  printf "  Select agents to install into:\n"
-  printf "  \e[2m↑↓ navigate · space toggle · a select all · enter confirm\e[0m\n\n"
-
-  _draw_menu
-
-  while true; do
-    local key seq
-    IFS= read -r -s -n1 key || break
-
-    if [[ "$key" == $'\x1b' ]]; then
-      IFS= read -r -s -n2 -t 0.1 seq || seq=""
-      case "$seq" in
-        '[A') [ "$MENU_CURSOR" -gt 0  ] && MENU_CURSOR=$((MENU_CURSOR-1)) ;;
-        '[B') [ "$MENU_CURSOR" -lt 12 ] && MENU_CURSOR=$((MENU_CURSOR+1)) ;;
-      esac
-
-    elif [[ "$key" == ' ' ]]; then
-      if [ "$MENU_CURSOR" -eq 0 ]; then
-        if _all_sel 2>/dev/null; then
-          SEL=( 0 0 0 0 0 0 0 0 0 0 0 0 )
-        else
-          SEL=( 1 1 1 1 1 1 1 1 1 1 1 1 )
-        fi
-      else
-        local idx=$((MENU_CURSOR-1))
-        [ "${SEL[$idx]}" -eq 1 ] && SEL[$idx]=0 || SEL[$idx]=1
-      fi
-
-    elif [[ "$key" == 'a' || "$key" == 'A' ]]; then
-      SEL=( 1 1 1 1 1 1 1 1 1 1 1 1 )
-
-    elif [[ "$key" == $'\r' || "$key" == $'\n' || -z "$key" ]]; then
-      break
+  # Neither fzf nor gum found — offer to install gum via brew
+  if command -v brew >/dev/null 2>&1; then
+    echo "  For a better selection UI, install gum (Charm):"
+    echo "    brew install gum"
+    echo ""
+    printf "  Install gum now? [y/N] "
+    local answer
+    read -r answer
+    echo ""
+    if [[ "$answer" =~ ^[Yy]$ ]]; then
+      brew install gum
+      _select_with_gum && return 0
     fi
+  fi
 
-    _draw_menu
-  done
-
-  tput cud "$MENU_LINES" 2>/dev/null || true
-  printf "\n"
-
-  stty "$old_stty" 2>/dev/null || true
-  tput cnorm 2>/dev/null || true
+  # Final fallback: numbered list
+  _select_fallback
 }
 
 # ─── Project-level + Global symlinks ────────────────────────────────────────
