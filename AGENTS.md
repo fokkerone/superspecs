@@ -2,29 +2,34 @@
 
 SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 
+## Commands
+
+**Claude Code / Cursor:** `/superspecs:<cmd>`
+**OpenCode:** `/superspecs-<cmd>`
+
 ## Lifecycle (always in order)
 
 **Phase 0 — Setup**
-- `/techstack` — questionnaire: define stack, get skill & library recommendations, save to wiki
+- `/superspecs:techstack` — questionnaire: define stack, get skill & library recommendations, save to wiki
 
 **Phase 1 — Plan**
-- `/discuss` — capture decisions before planning
-- `/spec` — write spec (fits 200k context window)
-- `/grill` — stress-test spec against wiki + techstack before execution
+- `/superspecs:discuss` — capture decisions before planning
+- `/superspecs:spec` — write spec (fits 200k context window)
+- `/superspecs:grill` — stress-test spec against wiki + techstack before execution
 
 **Phase 2 — Execute**
-- `/pick-spec` — validate spec, check context fit
-- `/branch` — create branch/worktree
-- `/subagent` — fresh subagent per task, two-stage review
-- `/tdd` — RED-GREEN-REFACTOR, no exceptions
-- `/code-review` — critical issues block progress
+- `/superspecs:pick-spec` — validate spec, check context fit
+- `/superspecs:branch` — create branch/worktree
+- `/superspecs:subagent` — fresh subagent per task, two-stage review
+- `/superspecs:tdd` — RED-GREEN-REFACTOR, no exceptions
+- `/superspecs:code-review` — critical issues block progress
 
 **Phase 3 — Verify**
-- `/check-tests` — full suite, every scenario covered
-- `/wiki` — distill to knowledge base
+- `/superspecs:check-tests` — full suite, every scenario covered
+- `/superspecs:wiki` — distill to knowledge base
 
 **Phase 4 — Ship**
-- `/ship` — PR, archive, next cycle
+- `/superspecs:ship` — PR, archive, next cycle
 
 ## Rules
 - No implementation code before a failing test

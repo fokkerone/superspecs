@@ -219,18 +219,18 @@ Then open your agent and say: **"Tell me about your superspecs"**
 ### First feature
 
 ```
-/techstack  Define stack, get skill & library recommendations
-/discuss  What are we building and why?
-/spec     Write the spec
-/grill    Stress-test spec against wiki + techstack
-/pick-spec  Confirm it fits a clean context
-/branch   Create worktree
-/subagent Start execution
-/tdd      Enforce RED-GREEN-REFACTOR
-/code-review  Check between tasks
-/check-tests  Verify everything passes
-/wiki     Distill to knowledge base
-/ship     PR + archive
+/superspecs:techstack  Define stack, get skill & library recommendations
+/superspecs:discuss    What are we building and why?
+/superspecs:spec       Write the spec
+/superspecs:grill      Stress-test spec against wiki + techstack
+/superspecs:pick-spec  Confirm it fits a clean context
+/superspecs:branch     Create worktree
+/superspecs:subagent   Start execution
+/superspecs:tdd        Enforce RED-GREEN-REFACTOR
+/superspecs:code-review  Check between tasks
+/superspecs:check-tests  Verify everything passes
+/superspecs:wiki       Distill to knowledge base
+/superspecs:ship       PR + archive
 ```
 
 ---

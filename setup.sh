@@ -59,8 +59,9 @@ DIRS=(
 # Selection state (1=selected, 0=deselected) — all selected by default
 SEL=( 1 1 1 1 1 1 1 1 1 1 1 1 )
 
-# ─── Symlink helper ───────────────────────────────────────────────────────────
+# ─── Helpers ─────────────────────────────────────────────────────────────────
 
+# Skills: create <name>/SKILL.md directory structure (required by Claude + OpenCode discovery)
 symlink_skills() {
   local target_dir="$1"
   local label="$2"
@@ -69,7 +70,41 @@ symlink_skills() {
     local skill_name
     skill_name=$(basename "$skill_dir")
     local skill_file="$skill_dir/SKILL.md"
-    [ -f "$skill_file" ] && ln -sf "$skill_file" "$target_dir/$skill_name.md" 2>/dev/null || true
+    if [ -f "$skill_file" ]; then
+      rm -f "$target_dir/$skill_name.md" 2>/dev/null || true   # remove old flat-file if present
+      mkdir -p "$target_dir/$skill_name"
+      ln -sf "$skill_file" "$target_dir/$skill_name/SKILL.md" 2>/dev/null || true
+    fi
+  done
+  echo "  ✓ $label"
+}
+
+# Commands: symlink each skill as a command file using its slash_command value
+# Claude Code style: <cmd_dir>/superspecs/<slash_cmd>.md  → /superspecs:<slash_cmd>
+# OpenCode style:    <cmd_dir>/superspecs-<slash_cmd>.md  → /superspecs-<slash_cmd>
+install_commands() {
+  local cmd_dir="$1"   # base commands directory
+  local prefix="$2"    # "" (use superspecs/ subdir) or "superspecs-" (flat prefix)
+  local label="$3"
+  local target_dir
+
+  if [ -z "$prefix" ]; then
+    target_dir="$cmd_dir/superspecs"
+  else
+    target_dir="$cmd_dir"
+  fi
+  mkdir -p "$target_dir"
+
+  for skill_dir in "$SKILLS_DIR"/*/; do
+    local skill_file="$skill_dir/SKILL.md"
+    [ -f "$skill_file" ] || continue
+    local slash_cmd
+    slash_cmd=$(grep '^slash_command:' "$skill_file" 2>/dev/null | head -1 \
+                | sed 's/^slash_command: *//' | tr -d '"' | tr -d "'")
+    [ -z "$slash_cmd" ] && continue
+    # Skip template placeholders like <command:name>
+    case "$slash_cmd" in *"<"*) continue ;; esac
+    ln -sf "$skill_file" "$target_dir/${prefix}${slash_cmd}.md" 2>/dev/null || true
   done
   echo "  ✓ $label"
 }
@@ -198,6 +233,16 @@ if [ "$SKIP_SYMLINKS" != "1" ]; then
     fi
   done
   [ "$glob_done" -eq 1 ] && echo ""
+
+  # ── Commands ── always install for Claude Code + OpenCode (project + global)
+  echo "→ Installing slash commands..."
+  # Claude Code  (subdir style  →  /superspecs:<cmd>)
+  install_commands "$PROJECT_DIR/.claude/commands"       ""             "Claude Code commands (project)"
+  install_commands "$HOME/.claude/commands"              ""             "Claude Code commands (global)"
+  # OpenCode     (flat prefix   →  /superspecs-<cmd>)
+  install_commands "$PROJECT_DIR/.opencode/commands"     "superspecs-"  "OpenCode commands (project)"
+  install_commands "$HOME/.config/opencode/commands"     "superspecs-"  "OpenCode commands (global)"
+  echo ""
 fi
 
 # ─── Initialize SuperSpecs directories ───────────────────────────────────────
@@ -238,17 +283,20 @@ echo "╚═══════════════════════�
 echo ""
 echo "  Open your agent and say: \"Tell me about your superspecs\""
 echo ""
+echo "  Claude Code / Cursor:  /superspecs:<cmd>"
+echo "  OpenCode:              /superspecs-<cmd>"
+echo ""
 echo "  First feature workflow:"
-echo "    /techstack   ← define stack + get library recommendations"
-echo "    /discuss     ← capture decisions"
-echo "    /spec        ← write the spec"
-echo "    /grill       ← stress-test spec against wiki + techstack"
-echo "    /pick-spec   ← validate + prepare"
-echo "    /branch      ← create worktree"
-echo "    /subagent    ← execute with TDD"
-echo "    /tdd         ← RED-GREEN-REFACTOR"
-echo "    /code-review ← review between tasks"
-echo "    /check-tests ← verify full suite"
-echo "    /wiki        ← distill to knowledge base"
-echo "    /ship        ← PR + archive"
+echo "    /superspecs:techstack   (or /superspecs-techstack)"
+echo "    /superspecs:discuss     (or /superspecs-discuss)"
+echo "    /superspecs:spec        (or /superspecs-spec)"
+echo "    /superspecs:grill       (or /superspecs-grill)"
+echo "    /superspecs:pick-spec   (or /superspecs-pick-spec)"
+echo "    /superspecs:branch      (or /superspecs-branch)"
+echo "    /superspecs:subagent    (or /superspecs-subagent)"
+echo "    /superspecs:tdd         (or /superspecs-tdd)"
+echo "    /superspecs:code-review (or /superspecs-code-review)"
+echo "    /superspecs:check-tests (or /superspecs-check-tests)"
+echo "    /superspecs:wiki        (or /superspecs-wiki)"
+echo "    /superspecs:ship        (or /superspecs-ship)"
 echo ""
