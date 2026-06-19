@@ -160,6 +160,7 @@ If over 150k, stop and propose decomposition before proceeding.
 - [x] Discussion complete (DISCUSS.md)
 - [x] Spec written
 - [x] Spec fits context window (~Xk / 200k)
+- [ ] Spec grilled and stress-tested (GRILL.md)
 - [ ] Branch created
 ...
 ```
@@ -176,8 +177,10 @@ Scenarios: Y
 Tasks: Z across W waves
 Context estimate: ~Xk / 200k ✅
 
-Next: /pick-spec <slug>
+Next: /grill <slug>
 ```
+
+Do not suggest `/pick-spec` directly. The spec must survive a grill session first.
 
 ## Output
 

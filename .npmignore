@@ -1,0 +1,24 @@
+# Exclude dev/runtime artifacts from the npm package
+
+# Git
+.git/
+.gitignore
+
+# macOS
+.DS_Store
+
+# Local dev / runtime
+superspec/
+node_modules/
+*.log
+
+# Article / docs not needed in the package
+superspecs-medium-article.md
+LOCALDEVELOPMENT.md
+
+# Agent config dirs (skills are symlinks; the source .skills/ is included via package.json files)
+.claude/
+.cursor/
+.windsurf/
+.agents/
+.github/

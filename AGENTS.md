@@ -10,6 +10,7 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 **Phase 1 — Plan**
 - `/discuss` — capture decisions before planning
 - `/spec` — write spec (fits 200k context window)
+- `/grill` — stress-test spec against wiki + techstack before execution
 
 **Phase 2 — Execute**
 - `/pick-spec` — validate spec, check context fit
@@ -29,6 +30,7 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 - No implementation code before a failing test
 - Critical review findings block all progress
 - Spec must fit a fresh 200k context window
+- Spec must pass grill before execution
 - Every shipped feature → wiki page
 
 ## Paths

@@ -6,8 +6,20 @@
     "superspecs": "./bin/superspecs.js"
   },
   "scripts": {
-    "install-framework": "bash setup.sh"
+    "install-framework": "bash setup.sh",
+    "prepublishOnly": "node -c bin/superspecs.js && node bin/superspecs.js version"
   },
+  "files": [
+    "bin/",
+    ".skills/",
+    "setup.sh",
+    "CLAUDE.md",
+    "AGENTS.md",
+    "GEMINI.md",
+    "HOWITWORKS.md",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "ai",
     "tdd",
@@ -18,11 +30,23 @@
     "copilot",
     "agentic",
     "wiki",
-    "development-workflow"
+    "development-workflow",
+    "ai-agents",
+    "llm",
+    "specification",
+    "workflow"
   ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/superspecs.git"
-  }
+    "url": "https://github.com/fokkerone/superspecs.git"
+  },
+  "homepage": "https://github.com/fokkerone/superspecs#readme",
+  "bugs": {
+    "url": "https://github.com/fokkerone/superspecs/issues"
+  },
+  "preferGlobal": true
 }

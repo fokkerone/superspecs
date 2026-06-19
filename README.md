@@ -62,7 +62,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  Every requirement is testable.                     │
 │  The spec fits a fresh 200k context window.         │
 ├─────────────────────────────────────────────────────┤
-│  /discuss  →  /spec                                 │
+│  /discuss  →  /spec  →  /grill                      │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -123,7 +123,22 @@ Write an OpenSpec-style spec from the discussion. Requirements expressed as SHAL
 
 **Exit criterion:** spec + context fits a fresh 200k-token window. If it doesn't, decompose into smaller specs.
 
-**Skills:** `/discuss` → `/spec`
+### 1.3 Grill (`/grill`)
+
+A relentless interview to stress-test the spec before any code is written. The agent walks every branch of the decision tree — one question at a time, always providing a recommended answer.
+
+The grill validates the spec against two sources of truth:
+
+- **Wiki** — does the spec contradict established patterns, decisions, or interfaces already documented?
+- **Techstack** — does the spec assume libraries, approaches, or patterns that conflict with the defined stack?
+
+If the codebase can answer a question, the agent explores it instead of asking. The session ends with a verdict: **READY** (proceed to `/pick-spec`) or **NEEDS REVISION** (spec must be updated and re-grilled).
+
+Output: `superspec/specs/<slug>/GRILL.md` + any required updates to `spec.md`.
+
+**Exit criterion:** verdict is READY. A spec that hasn't been grilled does not proceed to execution.
+
+**Skills:** `/discuss` → `/spec` → `/grill`
 
 ---
 
@@ -207,6 +222,7 @@ Then open your agent and say: **"Tell me about your superspecs"**
 /techstack  Define stack, get skill & library recommendations
 /discuss  What are we building and why?
 /spec     Write the spec
+/grill    Stress-test spec against wiki + techstack
 /pick-spec  Confirm it fits a clean context
 /branch   Create worktree
 /subagent Start execution
@@ -273,6 +289,7 @@ your-project/
 | Setup   | `techstack`         | `/techstack`   | Questionnaire: define stack, recommend skills & libraries, save wiki profile |
 | Plan    | `plan-discuss`      | `/discuss`     | Capture decisions before planning                                            |
 | Plan    | `plan-spec`         | `/spec`        | Write OpenSpec-style spec                                                    |
+| Plan    | `plan-grill`        | `/grill`       | Stress-test spec against wiki + techstack, blocks execution until READY      |
 | Execute | `execute-pick-spec` | `/pick-spec`   | Choose + validate next spec                                                  |
 | Execute | `execute-branch`    | `/branch`      | Create branch / worktree                                                     |
 | Execute | `execute-subagent`  | `/subagent`    | Parallel subagent task execution                                             |
