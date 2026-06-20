@@ -52,7 +52,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  Define the stack. Get skill & library recs.        │
 │  Ground every session that follows.                 │
 ├─────────────────────────────────────────────────────┤
-│  /techstack                                         │
+│  /superspecs:techstack                              │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -63,8 +63,9 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  Every requirement is testable.                     │
 │  The spec fits a fresh 200k context window.         │
 ├─────────────────────────────────────────────────────┤
-│  /design-import <path>  (optional, see §1.0)        │
-│  /discuss  →  /spec  →  /grill                      │
+│  /superspecs:design-import  (optional, §1.0)        │
+│  /superspecs:discuss  →  /superspecs:spec           │
+│    →  /superspecs:grill                             │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -75,8 +76,9 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  RED before GREEN, always.                          │
 │  Critical findings block all progress.              │
 ├─────────────────────────────────────────────────────┤
-│  /pick-spec  →  /branch  →  /subagent               │
-│  (TDD per task)  →  /code-review                    │
+│  /superspecs:pick-spec  →  /superspecs:branch       │
+│    →  /superspecs:subagent  (TDD per task)          │
+│    →  /superspecs:code-review                       │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -86,7 +88,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  Full suite. Every spec scenario has a test.        │
 │  Then distill everything into the wiki.             │
 ├─────────────────────────────────────────────────────┤
-│  /check-tests  →  /wiki                             │
+│  /superspecs:check-tests  →  /superspecs:wiki       │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -95,7 +97,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 ├─────────────────────────────────────────────────────┤
 │  PR. Changelog. Archive. Start the next cycle.      │
 ├─────────────────────────────────────────────────────┤
-│  /ship                                              │
+│  /superspecs:ship                                   │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -117,7 +119,7 @@ Before any code exists, the plan must fit in a fresh 200k-token context window. 
 
 ### 1.0 Design Import (`/superspecs:design-import`) — optional
 
-> **Optional enrichment.** Run before `/discuss` when you have a DesignOS export. Creates `design-context.md` that carries design constraints, data shapes, milestone structure, and test scaffolding. The normal `/discuss` + `/spec` flow still runs — it just reads `design-context.md` alongside `DISCUSS.md`.
+> **Optional enrichment.** Run before `/superspecs:discuss` when you have a DesignOS export. Creates `design-context.md` that carries design constraints, data shapes, milestone structure, and test scaffolding. The normal `/superspecs:discuss` + `/superspecs:spec` flow still runs — it just reads `design-context.md` alongside `DISCUSS.md`.
 
 A DesignOS export is a structured product package: product overview, incremental milestones, test instructions, TypeScript types, design system tokens, and component screenshots. This skill reads the export and extracts the planning-relevant material into a single context file.
 
@@ -125,11 +127,11 @@ A DesignOS export is a structured product package: product overview, incremental
 
 | DesignOS file | Extracted as |
 |--------------|--------------|
-| `product-overview.md` | Product overview + open questions for `/discuss` |
+| `product-overview.md` | Product overview + open questions for `/superspecs:discuss` |
 | `incremental/01-shell.md` … `NN-section.md` | Milestone → wave mapping for `tasks.md` |
-| `test-instructions/tests.md` | Test scaffolding → GIVEN/WHEN/THEN starting points for `/spec` |
-| `data-shape/types.ts` | Data contract → Interface section in `/spec` |
-| `design-system/` | Locked constraint → NFRs + Out of Scope in `/spec` |
+| `test-instructions/tests.md` | Test scaffolding → GIVEN/WHEN/THEN starting points for `/superspecs:spec` |
+| `data-shape/types.ts` | Data contract → Interface section in `/superspecs:spec` |
+| `design-system/` | Locked constraint → NFRs + Out of Scope in `/superspecs:spec` |
 | `components/screenshots/` | Preserved in `wiki/raw/design-system/screenshots/` (visual refs for subagents) |
 
 **Build order is sequential:** Each DesignOS milestone maps to one execution wave. Wave N always depends on Wave N-1. The shell milestone (01) is always Wave 1 — it installs design tokens and structure that all later sections depend on.
@@ -161,7 +163,7 @@ The grill validates the spec against two sources of truth:
 - **Wiki** — does the spec contradict established patterns, decisions, or interfaces already documented?
 - **Techstack** — does the spec assume libraries, approaches, or patterns that conflict with the defined stack?
 
-If the codebase can answer a question, the agent explores it instead of asking. The session ends with a verdict: **READY** (proceed to `/pick-spec`) or **NEEDS REVISION** (spec must be updated and re-grilled).
+If the codebase can answer a question, the agent explores it instead of asking. The session ends with a verdict: **READY** (proceed to `/superspecs:pick-spec`) or **NEEDS REVISION** (spec must be updated and re-grilled).
 
 Output: `superspec/specs/<slug>/GRILL.md` + any required updates to `spec.md`.
 
@@ -253,13 +255,13 @@ The wiki is a compiled, structured knowledge base that outlives every session. I
 superspec/wiki/
 ├── raw/                ← you drop files here; agent reads, never edits
 ├── _meta/
-│   └── taxonomy.md     ← canonical tag vocabulary (managed by /tag-taxonomy)
-├── _archives/          ← timestamped vault snapshots (managed by /wiki-rebuild)
+│   └── taxonomy.md     ← canonical tag vocabulary (managed by /superspecs:tag-taxonomy)
+├── _archives/          ← timestamped vault snapshots (managed by /superspecs:wiki-rebuild)
 ├── Home.md             ← vault home: domain table + recent updates
 ├── log.md              ← append-only activity log (grep-friendly)
 ├── _manifest.json      ← machine-readable ingestion history
-├── _lint-report.md     ← written by /wiki-lint
-├── _insights.md        ← written by /wiki-status (optional)
+├── _lint-report.md     ← written by /superspecs:wiki-lint
+├── _insights.md        ← written by /superspecs:wiki-status (optional)
 └── <domain>/
     ├── Home.md         ← domain index
     ├── <topic-a>.md    ← one page per knowledge unit
@@ -291,7 +293,7 @@ superspec/wiki/
 ├── data/            ← models, schemas, storage
 ├── infra/           ← deployment, CI/CD, environment
 ├── ui/              ← frontend, components, styling
-├── techstack/       ← stack profile (managed by /techstack)
+├── techstack/       ← stack profile (managed by /superspecs:techstack)
 └── <feature-slug>/  ← only if nothing above fits
 ```
 
@@ -316,14 +318,14 @@ superspec/wiki/
 
 ### Ingest — `/superspecs:wiki`
 
-Run after every `/ship`. Compiles a completed, verified feature into the wiki.
+Run after every `/superspecs:ship`. Compiles a completed, verified feature into the wiki.
 
 **What it does:**
 
 1. Reads raw source material — `DISCUSS.md`, `spec.md`, `review-log.md`, key implementation files
 2. **Scans existing wiki pages first** — updates a page if the topic already exists, never creates duplicates
 3. Writes new pages with full frontmatter:
-   - `summary:` — 1–2 sentence preview (used by `/wiki-query` for fast retrieval)
+   - `summary:` — 1–2 sentence preview (used by `/superspecs:wiki-query` for fast retrieval)
    - `tags:` — from `_meta/taxonomy.md` canonical vocabulary
    - `provenance:` — tracks what % of content is extracted vs. inferred
    - `[[wikilinks]]` for all internal cross-references
@@ -408,7 +410,7 @@ HUB PAGES        [[auth/jwt-refresh]] (12 backlinks), [[patterns/error-handling]
 TAG DISTRIBUTION auth (14)  api (11)  patterns (9) ...
 PROVENANCE       Extracted: 72%  Inferred: 23%  Ambiguous: 5%
 PENDING          2 specs not yet compiled, 1 raw/ file not yet ingested
-HEALTH           3 orphans, 1 broken link (run /wiki-lint for details)
+HEALTH           3 orphans, 1 broken link (run /superspecs:wiki-lint for details)
 ```
 
 Optionally writes a full `_insights.md` to the vault.
@@ -516,7 +518,7 @@ your-project/
 │   ├── specs/                      # Feature specifications
 │   │   └── <slug>/
 │   │       ├── DISCUSS.md          # Pre-planning decisions
-│   │       ├── design-context.md   # Optional — from /design-import (DesignOS enrichment)
+│   │       ├── design-context.md   # Optional — from /superspecs:design-import (DesignOS enrichment)
 │   │       ├── spec.md             # The spec (SHALL + scenarios)
 │   │       ├── tasks.md            # Implementation tasks
 │   │       └── status.md           # Phase + checklist
@@ -603,7 +605,7 @@ your-project/
 
 **Tests first, always.** Code written before tests gets deleted. No exceptions. RED before GREEN.
 
-**Critical issues block progress.** A `/code-review` finding rated Critical is not a suggestion. Nothing moves forward until it's resolved.
+**Critical issues block progress.** A `/superspecs:code-review` finding rated Critical is not a suggestion. Nothing moves forward until it's resolved.
 
 **Knowledge outlives the session.** The wiki uses the Karpathy LLM Wiki pattern: raw sources are compiled once into structured, interlinked pages. Future sessions query the wiki — not the raw specs. Knowledge compounds; problems stay solved.
 
