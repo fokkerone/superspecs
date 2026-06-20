@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "description": "Spec-driven AI development: planning + TDD + living wiki memory",
   "bin": {
-    "superspecs": "./bin/superspecs.js"
+    "superspecs": "bin/superspecs.js"
   },
   "scripts": {
     "install-framework": "bash setup.sh",
@@ -42,7 +42,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fokkerone/superspecs.git"
+    "url": "git+https://github.com/fokkerone/superspecs.git"
   },
   "homepage": "https://github.com/fokkerone/superspecs#readme",
   "bugs": {
