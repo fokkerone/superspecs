@@ -29,9 +29,18 @@ Read all of the following before asking a single question:
 
 - `superspec/specs/<slug>/DISCUSS.md` — the original decisions
 - `superspec/specs/<slug>/spec.md` — the spec under review
-- `superspec/wiki/_index.md` — existing project knowledge
-- `superspec/wiki/techstack.md` — the defined stack (if it exists)
-- Any wiki pages in domains related to this feature
+- `superspec/wiki/techstack/profile.md` — the defined stack (if it exists)
+
+Then perform a tiered wiki scan for context relevant to this spec:
+
+**Tier 1 — Index scan:**
+- Read `superspec/wiki/Home.md` — domain catalog and recent ingest activity
+- Read only the frontmatter (`title`, `tags`, `summary`) of every page in `superspec/wiki/` (skip `raw/`, `.obsidian/`)
+- Score for relevance to this feature's domain and requirements
+
+**Tier 2 — Deep read:**
+- Open the 3–5 most relevant pages in full
+- Follow `[[wikilinks]]` one level deep for directly related pages
 
 Report what you loaded. Flag any contradictions you already see before the interview begins.
 

@@ -22,7 +22,7 @@ Work conversationally. One topic at a time. Never dump a wall of questions. Ask,
 
 Before asking anything, check for an existing tech stack profile:
 
-- Read `superspec/wiki/_index.md`
+- Read `superspec/wiki/Home.md` (if it exists)
 - Check for `superspec/wiki/techstack/profile.md`
 
 If a profile already exists:
@@ -456,15 +456,17 @@ _Browse all community skills: https://awesome-skills.com/_
 3. Reference this profile in every spec for consistency
 ```
 
-### 3.2 Update the wiki index
+### 3.2 Update the wiki Home page
 
-Add to `superspec/wiki/_index.md`:
+Update `superspec/wiki/Home.md` (create it if it doesn't exist) to include the techstack domain:
 
 ```markdown
 ## Domains
 
-- [[techstack/]] — Project tech stack, library choices, production checklists
-- ...existing domains...
+| Domain | Description |
+|--------|-------------|
+| [[techstack/]] | Project tech stack, library choices, production checklists |
+| _(further domains added as features ship)_ | |
 
 ## Recent Updates
 

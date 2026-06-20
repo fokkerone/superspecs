@@ -19,12 +19,21 @@ Decisions made during planning are cheap. Decisions discovered during implementa
 
 ### 1. Orient with the wiki
 
-Before asking anything, check `superspec/wiki/`:
-- Read `_index.md`
-- Scan domain folders relevant to what's being described
-- Note: existing patterns, past decisions, anything that should inform this discussion
+Before asking anything, scan the wiki for relevant context using tiered retrieval:
 
-Report what you found (or "wiki is empty / nothing relevant").
+**Tier 1 — Index scan (always):**
+- Read `superspec/wiki/Home.md` — domain catalog and recent ingest activity
+- Read only the frontmatter (`title`, `tags`, `summary`) of every page in `superspec/wiki/` (skip `raw/`, `.obsidian/`)
+- Score each page for relevance to the feature being described
+
+**Tier 2 — Deep read (targeted):**
+- Open the full body of the 3–5 most relevant pages
+- Follow `[[wikilinks]]` one level deep for directly related pages
+
+**Report before the first question:**
+- List relevant pages found with a one-line summary of what each contributes
+- Flag decisions, patterns, or interfaces that should inform or constrain this discussion
+- If the wiki is empty or nothing is relevant: say so explicitly — "Wiki has no relevant pages for this feature."
 
 ### 2. Understand the rough idea
 

@@ -39,11 +39,26 @@ Then check for `superspec/specs/<slug>/design-context.md`. If it exists, read it
 
 DISCUSS.md carries the human decisions. design-context.md carries the design constraints. The spec merges both.
 
-### 2. Check for existing specs in this domain
+### 2. Query the wiki for relevant patterns
 
-Read `superspec/wiki/Home.md` and any related specs in `superspec/specs/`. Note:
-- Patterns already established (naming, structure, error formats)
-- Decisions already made that this spec should be consistent with
+Perform a tiered wiki scan for patterns, interfaces, and decisions relevant to this feature:
+
+**Tier 1 — Index scan:**
+- Read `superspec/wiki/Home.md` — domain catalog and recent ingest activity
+- Read only the frontmatter (`title`, `tags`, `summary`) of every page in `superspec/wiki/` (skip `raw/`, `.obsidian/`)
+- Score for relevance to this feature's domain
+
+**Tier 2 — Deep read:**
+- Open the 3–5 most relevant pages in full
+- Note:
+  - Existing patterns this spec should follow or extend
+  - Established interfaces this feature must be consistent with
+  - Past decisions that constrain what's being designed
+  - Open questions from previous features this spec might resolve
+
+Also scan `superspec/specs/` for related specs (any status).
+
+**Report before writing.** If established wiki patterns conflict with what's described in DISCUSS.md, flag the conflict explicitly — do not silently apply one over the other.
 
 ### 3. Write spec.md
 
