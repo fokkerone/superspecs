@@ -81,13 +81,41 @@ For each existing page that overlaps with this feature:
 
 ### 3. Determine wiki structure
 
-Check `superspec/wiki/Home.md`. Identify:
-- Which domain folder this belongs in (create one if needed)
-- Whether any existing pages should be updated vs. new pages created
+Read `superspec/wiki/_meta/taxonomy.md` → build the canonical domain set from the `## Domains` table.
 
-Domain examples: `auth/`, `api/`, `data/`, `ui/`, `infra/`, `patterns/`, `decisions/`
+**Domain routing — use this decision tree for every knowledge unit:**
 
-Each domain is a subfolder. Each knowledge unit is a single `.md` file inside it.
+1. **Reusable cross-cutting pattern** (error handling, caching, retry, logging, testing patterns)?  
+   → `patterns/`
+
+2. **Architecture decision** — why X was chosen over Y, with trade-offs documented?  
+   → `decisions/`
+
+3. **Authentication, authorization, sessions, or tokens**?  
+   → `auth/`
+
+4. **API contract, endpoint design, versioning, or request/response shape**?  
+   → `api/`
+
+5. **Data model, schema, or storage decision**?  
+   → `data/`
+
+6. **Infrastructure, deployment, CI/CD, or environment config**?  
+   → `infra/`
+
+7. **Frontend, UI component, routing, or styling pattern**?  
+   → `ui/`
+
+8. **Feature-specific knowledge that fits none of the above**?  
+   → Create a domain named after the feature slug (e.g. `payment-flow/`)  
+   → Add the new domain to `_meta/taxonomy.md` under "Project Domains" before creating the folder
+
+**Rules:**
+- **One domain per page.** If a page spans multiple concerns, split it into separate pages.
+- **Prefer existing domains.** Only create a new domain if nothing in the taxonomy fits.
+- **Feature traceability lives in `spec:` frontmatter**, not in the folder name. A `payment-flow` feature can have pages in `api/`, `data/`, and `patterns/` — all tagged `spec: "[[payment-flow]]"`.
+
+After routing: does the chosen domain folder have a `Home.md`? If not, create a domain index listing its pages.
 
 ---
 

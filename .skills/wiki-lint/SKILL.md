@@ -77,6 +77,15 @@ Pages missing required YAML fields: `title`, `tags`, `created`, `updated`.
 #### 2h. Undocumented domains
 A domain folder exists in `wiki/` but has no `Home.md` index.
 
+#### 2i. Domain drift
+A domain folder exists in `wiki/` but is not listed in `_meta/taxonomy.md`.
+
+1. Read `_meta/taxonomy.md` → build canonical domain set from `## Domains` table and "Project Domains" section
+2. Compare against actual subdirectory names in `superspec/wiki/` (excluding `raw/`, `_meta/`, `_archives/`, `.obsidian/`)
+3. Flag any folder that is not in the taxonomy as drift
+
+Drift is usually one of: a typo (`authenication/`), a duplicate (`auth-flow/` when `auth/` exists), or a new domain that was created but never registered. Each case needs a different fix — flag separately.
+
 ---
 
 ### 3. Write the lint report
@@ -107,6 +116,7 @@ Pages scanned: <N>
 | Outdated pages | N |
 | Missing frontmatter | N |
 | Undocumented domains | N |
+| Domain drift | N |
 
 **Total issues: N** (<critical> critical, <warning> warnings)
 
@@ -175,6 +185,14 @@ Pages scanned: <N>
 > Domain folders without a Home.md index.
 
 - [ ] `<domain>/` — no Home.md _(fix: create domain index)_
+
+---
+
+## Domain Drift
+
+> Domain folders not listed in `_meta/taxonomy.md`. Possible typo, duplicate, or unregistered new domain.
+
+- [ ] `<domain>/` — not in taxonomy _(likely: typo / duplicate of `<canonical-domain>/` / new domain needing taxonomy entry)_
 
 ---
 

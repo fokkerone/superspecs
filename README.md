@@ -278,6 +278,42 @@ The wiki doubles as an **Obsidian vault**. Open `superspec/wiki/` in Obsidian fo
 
 ---
 
+### Domain Organization
+
+Domains are **concern-centric, not feature-centric**. A page's domain describes *what the knowledge is about*, not which feature introduced it. Feature traceability lives in `spec:` frontmatter.
+
+```
+superspec/wiki/
+├── patterns/        ← cross-cutting: error handling, caching, retry, testing
+├── decisions/       ← ADRs: why X was chosen over Y
+├── auth/            ← auth, sessions, tokens
+├── api/             ← contracts, endpoints, versioning
+├── data/            ← models, schemas, storage
+├── infra/           ← deployment, CI/CD, environment
+├── ui/              ← frontend, components, styling
+├── techstack/       ← stack profile (managed by /techstack)
+└── <feature-slug>/  ← only if nothing above fits
+```
+
+**Routing rules** (applied by `/superspecs:wiki` on ingest):
+
+| Knowledge unit | Domain |
+|----------------|--------|
+| Reusable cross-cutting pattern | `patterns/` |
+| Why X was chosen over Y | `decisions/` |
+| Auth / sessions / tokens | `auth/` |
+| API contract or endpoint design | `api/` |
+| Data model or storage decision | `data/` |
+| Infrastructure or deployment | `infra/` |
+| Frontend / UI / styling | `ui/` |
+| Feature-specific, doesn't fit above | `<feature-slug>/` |
+
+**One domain per page.** If a page spans multiple concerns, split it. **One knowledge unit = one page** — merge instead of creating duplicates.
+
+**The canonical domain list lives in `superspec/wiki/_meta/taxonomy.md`** under `## Domains`. This file is created by `superspecs install` with the core domains pre-populated. Add project-specific domains to the "Project Domains" section before creating new folders. `/superspecs:wiki-lint` detects drift — folders that exist but aren't registered in the taxonomy.
+
+---
+
 ### Ingest — `/superspecs:wiki`
 
 Run after every `/ship`. Compiles a completed, verified feature into the wiki.
@@ -341,6 +377,7 @@ Periodic health check. Finds structural and semantic problems.
 | **Stale file refs** | Backtick paths pointing to files that no longer exist |
 | **Missing frontmatter** | Pages missing `title`, `tags`, `summary:`, `created`, or `updated` |
 | **Undocumented domains** | Domain folder exists but has no `Home.md` |
+| **Domain drift** | Domain folder exists but isn't listed in `_meta/taxonomy.md` (typo, duplicate, or unregistered) |
 
 Output: `wiki/_lint-report.md` + appended `log.md`. Auto-fixes safe issues with confirmation; contradictions always require human review.
 
@@ -425,7 +462,7 @@ When the wiki has accumulated too much drift, archive and rebuild from scratch.
 | Before `/grill` — check existing decisions | `/superspecs:wiki-query` |
 | Mid-session — save important findings | `/superspecs:wiki-capture` |
 | Drop article/doc into `raw/` | `/superspecs:wiki <filename>` |
-| Check vault health | `/superspecs:wiki-status` |
+| Check vault health + domain drift | `/superspecs:wiki-status` |
 | Tags getting inconsistent | `/superspecs:tag-taxonomy` |
 | Monthly / before a release | `/superspecs:wiki-lint` |
 | Wiki has too much drift | `/superspecs:wiki-rebuild` |
