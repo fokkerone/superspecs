@@ -148,7 +148,7 @@ Total tasks: X
 Review findings resolved: Y
 Tests: X passing
 
-Next: /check-tests <slug>
+Next: /superspecs-verify <slug>
 ```
 
 Update `superspec/specs/<slug>/status.md`:

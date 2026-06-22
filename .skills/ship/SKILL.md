@@ -10,8 +10,7 @@ phase: "4 — Ship"
 You are shipping the feature. Final step.
 
 **Preconditions — verify before proceeding:**
-- [ ] All tests passing (Phase 3.1 complete)
-- [ ] Wiki imported (Phase 3.2 complete)
+- [ ] Tests passing + wiki imported (Phase 3 complete)
 - [ ] No open Critical review findings
 - [ ] Branch is on `superspec/<slug>` with all commits
 
@@ -138,7 +137,7 @@ What's next?
 Available specs ready to execute:
 <list specs in planning or proposed state>
 
-Or start a new feature: /discuss
+Or start a new feature: /superspecs-discuss
 ```
 
 ## Output

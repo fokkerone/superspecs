@@ -1,11 +1,106 @@
 ---
-name: verify-wiki
-description: Distill a completed, verified feature into the project wiki. Architecture decisions, patterns, trade-offs, gotchas. The knowledge that should outlive this session. Invoked as Stage 2 of /superspecs:verify. Can also be triggered standalone on /wiki, "import to wiki", "document the feature". Runs after tests pass.
-slash_command: wiki
-phase: "3 — Verify › Stage 2 Wiki Import"
+name: verify
+description: Phase 3 combined verify. Stage 1 — run the full test suite, check spec scenario coverage, confirm no regressions. Stage 2 — distill the completed feature into the project wiki (architecture decisions, patterns, trade-offs, gotchas). Gate between stages: if tests fail, stop — do not proceed to wiki. Triggers on /verify, "verify", "check and wiki". Runs after all execution waves are complete.
+slash_command: verify
+phase: "3 — Verify"
 ---
 
-# Skill: verify-wiki
+# Skill: verify
+
+You are doing the final verification before the feature can be shipped.
+
+Execution is complete. This skill runs in two sequential stages:
+
+1. **Stage 1 — Check Tests:** confirm the implementation works
+2. **Stage 2 — Wiki Import:** distill the knowledge
+
+**Gate:** If Stage 1 fails for any reason — failing tests, skipped tests, uncovered scenarios — stop. Do not proceed to Stage 2. Fix first.
+
+---
+
+## Stage 1 — Check Tests
+
+### 1. Run the full test suite
+
+```bash
+<test-runner>
+```
+
+Expected output: all tests passing, zero failing, zero skipped.
+
+Report the result:
+
+```
+Test suite: <date>
+
+Total:   <N>
+Passing: <N>  ✅
+Failing: <N>  ❌
+Skipped: <N>  ⚠️
+Pending: <N>  ⚠️
+```
+
+If anything is failing, skipped, or pending: stop. Report. Do not proceed.
+
+### 2. Verify spec scenario coverage
+
+Read `superspec/specs/<slug>/spec.md`. For every scenario:
+
+Search the test files for a test covering that scenario. Use the GIVEN/WHEN/THEN as search anchors.
+
+```markdown
+## Spec Coverage Report
+
+### Requirement: <Name>
+
+#### Scenario: <Name>
+Status: ✅ covered
+Test: `<test-file>:<line>` — `<test name>`
+
+#### Scenario: <Edge case name>
+Status: ❌ NOT COVERED
+Action required: Write a test for this scenario
+
+[...]
+
+## Summary
+Scenarios total: <N>
+Covered: <N>  ✅
+Missing: <N>  ❌
+```
+
+**If any scenario is uncovered:** this is a Critical gap. Write the missing test before proceeding.
+
+### 3. Run tests with coverage (if available)
+
+If the project has a coverage tool:
+
+```bash
+<coverage-tool> <test-runner>
+```
+
+Note:
+- Overall coverage %
+- Coverage of files touched by this feature
+- Any significant uncovered branches
+
+Coverage is informational — it informs judgment, but 100% coverage is not required. Scenario coverage (step 2) is required.
+
+### 4. Check for regressions
+
+Compare with baseline if available. Specifically check:
+- Areas of the codebase adjacent to what was changed
+- Integration points (APIs called, events emitted, etc.)
+
+If any tests that were passing before this spec's execution are now failing: that's a regression. It must be fixed before proceeding.
+
+---
+
+**Stage 1 gate:** All tests passing ✅ · All scenarios covered ✅ · No regressions ✅ → Proceed to Stage 2.
+
+---
+
+## Stage 2 — Wiki Import
 
 You are distilling the completed feature into the living project wiki.
 
@@ -13,7 +108,7 @@ The feature works. The tests pass. Now you extract the knowledge that should sur
 
 The wiki lives at `superspec/wiki/` and doubles as an **Obsidian vault**. Write every page to be navigable in Obsidian: use `[[wikilinks]]` for internal links, YAML frontmatter with `tags:`, and keep each page focused on a single knowledge unit.
 
-## What to distill (and what not to)
+### What to distill (and what not to)
 
 **Distill:**
 - Architecture decisions (what was chosen and why)
@@ -28,7 +123,7 @@ The wiki lives at `superspec/wiki/` and doubles as an **Obsidian vault**. Write 
 - Task checklists or execution logs
 - The full spec (it lives in `superspec/specs/`)
 
-## Provenance
+### Provenance
 
 Mark the origin of every claim so future readers know what is fact vs. synthesis:
 
@@ -43,11 +138,7 @@ A TTL of 15 minutes was selected as the balance point. ^[inferred]
 Note: the DISCUSS.md mentions 10 minutes but the spec says 15 — see review-log. ^[ambiguous]
 ```
 
----
-
-## Steps
-
-### 1. Gather the source material
+### 5. Gather the source material
 
 Read:
 - `superspec/specs/<slug>/DISCUSS.md`
@@ -55,9 +146,7 @@ Read:
 - `superspec/phases/<slug>-execute/review-log.md`
 - The implementation itself (key files touched)
 
----
-
-### 2. Scan existing wiki pages first
+### 6. Scan existing wiki pages first
 
 **Before writing anything new**, scan the existing wiki for related content.
 
@@ -77,49 +166,45 @@ For each existing page that overlaps with this feature:
 
 **Rule:** One knowledge unit = one page. Merge, don't proliferate.
 
----
-
-### 3. Determine wiki structure
+### 7. Determine wiki structure
 
 Read `superspec/wiki/_meta/taxonomy.md` → build the canonical domain set from the `## Domains` table.
 
 **Domain routing — use this decision tree for every knowledge unit:**
 
-1. **Reusable cross-cutting pattern** (error handling, caching, retry, logging, testing patterns)?  
+1. **Reusable cross-cutting pattern** (error handling, caching, retry, logging, testing patterns)?
    → `patterns/`
 
-2. **Architecture decision** — why X was chosen over Y, with trade-offs documented?  
+2. **Architecture decision** — why X was chosen over Y, with trade-offs documented?
    → `decisions/`
 
-3. **Authentication, authorization, sessions, or tokens**?  
+3. **Authentication, authorization, sessions, or tokens**?
    → `auth/`
 
-4. **API contract, endpoint design, versioning, or request/response shape**?  
+4. **API contract, endpoint design, versioning, or request/response shape**?
    → `api/`
 
-5. **Data model, schema, or storage decision**?  
+5. **Data model, schema, or storage decision**?
    → `data/`
 
-6. **Infrastructure, deployment, CI/CD, or environment config**?  
+6. **Infrastructure, deployment, CI/CD, or environment config**?
    → `infra/`
 
-7. **Frontend, UI component, routing, or styling pattern**?  
+7. **Frontend, UI component, routing, or styling pattern**?
    → `ui/`
 
-8. **Feature-specific knowledge that fits none of the above**?  
-   → Create a domain named after the feature slug (e.g. `payment-flow/`)  
+8. **Feature-specific knowledge that fits none of the above**?
+   → Create a domain named after the feature slug (e.g. `payment-flow/`)
    → Add the new domain to `_meta/taxonomy.md` under "Project Domains" before creating the folder
 
 **Rules:**
 - **One domain per page.** If a page spans multiple concerns, split it into separate pages.
 - **Prefer existing domains.** Only create a new domain if nothing in the taxonomy fits.
-- **Feature traceability lives in `spec:` frontmatter**, not in the folder name. A `payment-flow` feature can have pages in `api/`, `data/`, and `patterns/` — all tagged `spec: "[[payment-flow]]"`.
+- **Feature traceability lives in `spec:` frontmatter**, not in the folder name.
 
 After routing: does the chosen domain folder have a `Home.md`? If not, create a domain index listing its pages.
 
----
-
-### 4. Write wiki pages
+### 8. Write wiki pages
 
 For each new knowledge unit, create `superspec/wiki/<domain>/<topic>.md`:
 
@@ -192,9 +277,7 @@ When and why this was built. What problem it solves.
 - Tags: lowercase, hyphenated (`auth`, `jwt-tokens`, `session-management`)
 - Tags must come from `_meta/taxonomy.md` if it exists; add new tags there if needed
 
----
-
-### 5. Update the vault home page
+### 9. Update the vault home page
 
 Update `superspec/wiki/Home.md`:
 
@@ -224,9 +307,7 @@ _(last 10 — full history in [[log]])_
 
 Each domain folder should also have its own `Home.md` listing its pages.
 
----
-
-### 6. Cross-link
+### 10. Cross-link
 
 After writing all pages:
 - Scan existing wiki pages for unlinked mentions of new page topics
@@ -235,9 +316,7 @@ After writing all pages:
 
 Or invoke `/superspecs:cross-linker` to automate this step.
 
----
-
-### 7. Append to log.md
+### 11. Append to log.md
 
 Append to `superspec/wiki/log.md` (create if missing):
 
@@ -250,9 +329,7 @@ Append to `superspec/wiki/log.md` (create if missing):
 - **Spec:** [[../specs/<slug>/spec.md]]
 ```
 
----
-
-### 8. Update the manifest
+### 12. Update the manifest
 
 Update `superspec/wiki/_manifest.json`:
 
@@ -269,27 +346,34 @@ Update `superspec/wiki/_manifest.json`:
 }
 ```
 
----
-
-### 9. Update spec status
+### 13. Update spec status
 
 Update `superspec/specs/<slug>/status.md`:
 
 ```markdown
+## Test Results
+- Suite: X passing, 0 failing, 0 skipped
+- Spec scenarios: Y/Y covered
+- Regressions: none
+
 ## Wiki Pages
 - [[<domain>/<page>]] — <what it covers>
 
 ## Phase
-3.2 — Verify › Wiki Import ✅
+3 — Verify ✅
 ```
 
----
-
-### 10. Handoff
+### 14. Handoff
 
 ```
-Wiki import complete: <slug>
+Verify complete: <slug>
 
+Stage 1 — Tests
+Suite: <N> passing ✅
+Scenarios: <N>/<N> covered ✅
+Regressions: none ✅
+
+Stage 2 — Wiki
 Pages created: X
 Pages updated: Y
 
@@ -305,6 +389,40 @@ Run /cross-linker to auto-weave [[wikilinks]] across the vault.
 Open superspec/wiki/ in Obsidian to browse the vault.
 
 Next: /superspecs-ship <slug>
+```
+
+---
+
+## Fail states
+
+**Tests failing:**
+```
+❌ Test failures found: N
+
+Failing tests:
+- <test name> (<file>:<line>)
+  Error: <message>
+
+Stage 1 failed. Fix failures before proceeding to wiki import.
+```
+
+**Skipped or pending tests:**
+```
+⚠️ Skipped tests found: N
+
+Skipped tests are not passing tests. Options:
+1. Fix and unskip
+2. Delete if no longer relevant
+
+Do not proceed to wiki import with skipped tests that cover spec scenarios.
+```
+
+**Missing scenario coverage:**
+```
+❌ Uncovered spec scenarios: N
+
+- Scenario: <name> (Requirement: <name>)
+  No test found. Write one before proceeding to wiki import.
 ```
 
 ---

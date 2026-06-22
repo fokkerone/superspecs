@@ -261,8 +261,7 @@ What was extracted:
   - N open questions for /discuss
 
 Next steps:
-  /superspecs:discuss <slug>   Open the discussion (design-context.md is ready as input)
-  /superspecs:spec <slug>      Write the spec (reads DISCUSS.md + design-context.md)
+Next: /superspecs-discuss <slug>   Open the discussion (design-context.md is ready as input)
 ```
 
 ---

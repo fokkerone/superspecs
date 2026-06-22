@@ -1,8 +1,8 @@
 ---
 name: verify-tests
-description: Full test suite run. Every spec scenario must have a passing test. No skipped tests. No pending tests. Triggers on /check-tests, "run tests", "verify". Runs after all execution waves are complete.
+description: Full test suite run. Every spec scenario must have a passing test. No skipped tests. No pending tests. Invoked as Stage 1 of /superspecs:verify. Can also be triggered standalone on /check-tests, "run tests". Runs after all execution waves are complete.
 slash_command: check-tests
-phase: "3.1 — Verify › Check Tests"
+phase: "3 — Verify › Stage 1 Check Tests"
 ---
 
 # Skill: verify-tests
@@ -117,7 +117,7 @@ Suite: <N> passing ✅
 Scenarios: <N>/<N> covered ✅
 Regressions: none ✅
 
-Next: /wiki <slug>
+Next: /superspecs-wiki <slug>
 ```
 
 ## Fail states

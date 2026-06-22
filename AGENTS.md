@@ -14,9 +14,9 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 
 **Phase 1 — Plan**
 - `/superspecs:design-import <path>` — (optional) import DesignOS export → design-context.md; enriches /discuss + /spec with design constraints, data shapes, milestone structure, and test scaffolding
-- `/superspecs:discuss` — capture decisions before planning
-- `/superspecs:spec` — write spec (fits 200k context window)
-- `/superspecs:grill` — stress-test spec against wiki + techstack before execution
+- `/superspecs:discuss` — capture decisions before planning; required before /spec
+- `/superspecs:spec` — write spec (fits 200k context window); requires DISCUSS.md
+- `/superspecs:grill` — mandatory gate: stress-test spec against wiki + techstack; READY verdict required before /pick-spec; requires spec.md
 
 **Phase 2 — Execute**
 - `/superspecs:pick-spec` — validate spec, check context fit
@@ -26,8 +26,7 @@ SuperSpecs: spec-driven planning + parallel TDD execution + wiki memory.
 - `/superspecs:code-review` — critical issues block progress
 
 **Phase 3 — Verify**
-- `/superspecs:check-tests` — full suite, every scenario covered
-- `/superspecs:wiki` — compile feature to wiki (ingest)
+- `/superspecs:verify` — full suite + scenario coverage (Stage 1), then compile feature to wiki (Stage 2); gate between stages blocks wiki import if tests fail
 
 **Phase 4 — Ship**
 - `/superspecs:ship` — PR, archive, next cycle

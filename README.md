@@ -88,7 +88,7 @@ The result: five AI agents running in parallel, each with a fresh context, each 
 │  Full suite. Every spec scenario has a test.        │
 │  Then distill everything into the wiki.             │
 ├─────────────────────────────────────────────────────┤
-│  /superspecs:check-tests  →  /superspecs:wiki       │
+│  /superspecs:verify                                 │
 └─────────────────────────────────────────────────────┘
               │
               ▼
@@ -211,15 +211,15 @@ Runs between tasks. Reviews against the spec. Reports issues by severity. **Crit
 
 Walk through what was built. Diagnose and fix before declaring done. Then distill everything learned into the wiki — so the next session inherits the knowledge.
 
-### 3.1 Check Tests (`/superspecs:check-tests`)
+### `/superspecs:verify`
 
-Full test suite. Coverage check. Every spec scenario verified by a test. No passing with skipped or pending tests.
+Two sequential stages in one command:
 
-### 3.2 Wiki Import (`/superspecs:wiki`)
+**Stage 1 — Check Tests:** Full test suite. Coverage check. Every spec scenario verified by a test. No passing with skipped or pending tests.
 
-Compile the implemented feature into the project wiki — architecture decisions, patterns, trade-offs, gotchas. The wiki is the memory that outlives the session. See [The Wiki](#the-wiki) for the full architecture, ingest process, query, and lint operations.
+**Stage 2 — Wiki Import:** Compile the implemented feature into the project wiki — architecture decisions, patterns, trade-offs, gotchas. Runs only if Stage 1 passes. The wiki is the memory that outlives the session. See [The Wiki](#the-wiki) for the full architecture, ingest process, query, and lint operations.
 
-**Skills:** `/superspecs:check-tests` → `/superspecs:wiki`
+**Skills:** `/superspecs:verify`
 
 ### Wiki Operations (any time)
 
@@ -549,8 +549,9 @@ your-project/
 │   ├── execute-subagent/SKILL.md
 │   ├── execute-tdd/SKILL.md
 │   ├── execute-review/SKILL.md
-│   ├── verify-tests/SKILL.md
-│   ├── verify-wiki/SKILL.md
+│   ├── verify/SKILL.md
+│   ├── verify-tests/SKILL.md      # standalone (also invoked by verify)
+│   ├── verify-wiki/SKILL.md       # standalone (also invoked by verify)
 │   ├── wiki-query/SKILL.md
 │   ├── wiki-lint/SKILL.md
 │   ├── cross-linker/SKILL.md
@@ -585,8 +586,7 @@ your-project/
 | Execute | `execute-subagent`  | `/superspecs:subagent`       | Parallel subagent task execution                                             |
 | Execute | `execute-tdd`       | `/superspecs:tdd`            | RED-GREEN-REFACTOR — runs inside each subagent task; invoke standalone for code outside subagent mode |
 | Execute | `execute-review`    | `/superspecs:code-review`    | Between-task spec + quality review                                           |
-| Verify  | `verify-tests`      | `/superspecs:check-tests`    | Full suite + scenario coverage                                               |
-| Verify  | `verify-wiki`       | `/superspecs:wiki`           | Compile feature to wiki — ingest, provenance, summary frontmatter           |
+| Verify  | `verify`            | `/superspecs:verify`         | Stage 1: full suite + scenario coverage; Stage 2: compile feature to wiki   |
 | Wiki    | `wiki-query`        | `/superspecs:wiki-query`     | Tiered retrieval query; optionally file answer back as a page               |
 | Wiki    | `wiki-lint`         | `/superspecs:wiki-lint`      | Health check: orphans, broken links, contradictions, stale refs             |
 | Wiki    | `cross-linker`      | `/superspecs:cross-linker`   | Auto-insert `[[wikilinks]]` for unlinked mentions across the vault          |

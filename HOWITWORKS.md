@@ -159,8 +159,7 @@ The per-task cycle:
 **Goal:** Confirm the implementation matches the spec and the knowledge is preserved.
 
 ```
-/superspecs:check-tests  Full suite run; every spec scenario covered by a test; no skips
-/superspecs:wiki         Compile feature → superspec/wiki/<domain>/<topic>.md
+/superspecs:verify  Full suite + scenario coverage (Stage 1) → compile feature to wiki (Stage 2)
 ```
 
 The wiki implements the **Karpathy LLM Wiki pattern**: raw sources are compiled once into structured, interlinked markdown pages. Future sessions query the compiled wiki — never the raw specs. The agent compiles once; queries are fast and accurate.

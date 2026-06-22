@@ -189,10 +189,10 @@ Deferred questions: Z
 
 Verdict: READY / NEEDS REVISION
 
-Next: /pick-spec <slug>
+Next: /superspecs-pick-spec <slug>
 ```
 
-If verdict is NEEDS REVISION, do not suggest `/pick-spec`. Say: *"Update the spec first, then re-run `/grill <slug>` to confirm."*
+If verdict is NEEDS REVISION, do not suggest `/pick-spec`. Say: *"Update the spec first, then re-run `/superspecs-grill <slug>` to confirm."*
 
 ## Output
 

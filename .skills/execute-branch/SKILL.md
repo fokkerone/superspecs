@@ -92,7 +92,7 @@ Branch ready: superspec/<slug>
 Type: <branch/worktree>
 Base: <base-branch> @ <SHA>
 
-Next: /subagent <slug>   (to start Wave 1)
+Next: /superspecs-subagent <slug>
 ```
 
 ## Output

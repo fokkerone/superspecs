@@ -145,7 +145,7 @@ Create `superspec/specs/<slug>/status.md`:
 
 Show the DISCUSS.md. Say:
 
-> "Discussion captured. Ready to write the spec? → `/spec <slug>`"
+> "Discussion captured. Ready to write the spec? → `/superspecs-spec <slug>`"
 
 Do not write the spec automatically. The user confirms first.
 

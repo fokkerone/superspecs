@@ -152,7 +152,7 @@ Context: ~<N>k / 200k ✅
 Tasks: X across Y waves
 Validation: ✅ complete
 
-Next: /branch <slug>
+Next: /superspecs-branch <slug>
 ```
 
 ## Output

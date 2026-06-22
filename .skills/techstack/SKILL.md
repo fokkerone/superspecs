@@ -452,7 +452,7 @@ _Browse all community skills: https://awesome-skills.com/_
 ## Recommended Next Steps
 
 1. Install the skills listed above (copy-paste install commands)
-2. Run `/discuss` to start planning the first feature
+2. Run `/superspecs-discuss` to start planning the first feature
 3. Reference this profile in every spec for consistency
 ```
 
@@ -505,8 +505,7 @@ Production checklist items: <count>
 
 Suggested next steps:
   Install community skills (commands in profile.md)
-  /discuss — start planning your first feature
-  /spec    — write a spec for something specific
+  /superspecs-discuss — start planning your first feature
 ```
 
 ---

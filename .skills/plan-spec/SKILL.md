@@ -202,10 +202,10 @@ Scenarios: Y
 Tasks: Z across W waves
 Context estimate: ~Xk / 200k ✅
 
-Next: /grill <slug>
+Next: /superspecs-grill <slug>
 ```
 
-Do not suggest `/pick-spec` directly. The spec must survive a grill session first.
+Do not suggest `/pick-spec` directly. The spec must survive `/superspecs-grill` first.
 
 ## Output
 

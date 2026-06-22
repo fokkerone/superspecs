@@ -142,6 +142,7 @@ The framework's source of truth is the `.skills/` directory. Each skill is a sin
 ├── execute-subagent/SKILL.md
 ├── execute-tdd/SKILL.md
 ├── execute-review/SKILL.md
+├── verify/SKILL.md
 ├── verify-tests/SKILL.md
 ├── verify-wiki/SKILL.md
 ├── ship/SKILL.md
