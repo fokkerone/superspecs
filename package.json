@@ -1,6 +1,6 @@
 {
   "name": "superspecs",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "Spec-driven AI development: planning + TDD + living wiki memory",
   "bin": {
     "superspecs": "bin/superspecs.js"
